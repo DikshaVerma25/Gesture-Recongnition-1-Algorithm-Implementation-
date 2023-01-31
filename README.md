@@ -20,9 +20,15 @@ Line **1-3** the libraries are imported.<br>
 *B) Creating canvas*
 
 Line **6-7** Instance of Tk class is created which is stored in the variable root. And renaming the the canvas as Group 21. <br>
-Line **9-10** Instance of class "Canvas" is craeted which is stored in varible "canvas". Later the height and width are specified. Pack method t=helps in managing the canvas to occupy the space available in the window. 
+Line **9-10** Instance of class "Canvas" is craeted which is stored in varible "canvas". Later the height and width are specified. Pack method helps in managing the canvas to occupy the space available in the window. 
 
 *C) Using "mouseclickevent" and "draw" to enable drawing*
+
+Line **13-24** The "mouseclickevent" and "draw" is triggered when the mouse button is pressed and moved. Event is passed as the argument which stored the x and y coordinates of the drawing. 
+
+*D) Adding eraser*
+
+Line **25-26** Here button widget named "erase_button" is made, where the button is given as "Erase". Lamba is passed the command calling delete method for erasing everything on canvas (all). This button is added to root using the method pack. 
 
 
 
