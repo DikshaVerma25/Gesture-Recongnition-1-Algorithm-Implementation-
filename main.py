@@ -6,7 +6,7 @@ import tkinter as tk
 root = tk.Tk()
 root.title("Group 21")
 
-canvas = Canvas(root, width=1000, height=5000)
+canvas = Canvas(root, width=800, height=800)
 canvas.pack()
 
 
@@ -21,7 +21,8 @@ def draw(event):
 
 canvas.bind("<Button-1>", mouseclickevent)
 canvas.bind("<B1-Motion>", draw)
-# Create a button widget
+
+#Adding eraser button
 erase_button = Button(root, text="Erase", command=lambda: canvas.delete("all"))
 erase_button.pack()
 
