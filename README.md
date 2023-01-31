@@ -15,7 +15,8 @@ d) allow the user to clear the canvas.
 
 *A) Importing the libraries and initializing the canvas*
 
-Line **1-3** the libraries are imported.  Line **6-7** Instance of Tk class is created which is stored in the variable root. And renaming the the canvas as Group 21. 
+Line **1-3** the libraries are imported.<br>
+Line **6-7** Instance of Tk class is created which is stored in the variable root. And renaming the the canvas as Group 21. <br>
 Line 
 
 
