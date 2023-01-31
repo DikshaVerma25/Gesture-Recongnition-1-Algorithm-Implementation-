@@ -1,14 +1,14 @@
+#Importing the libraries 
 from tkinter import *
 import tkinter as tk
 
+#Initializing and creating the canvas
 root = tk.Tk()
-root.title("Original Title")
+root.title("Group 21")
 
-# Create a canvas widget
-canvas = Canvas(root, width=200, height=200)
+canvas = Canvas(root, width=1000, height=5000)
 canvas.pack()
 
-root.title("Group 21")
 
 def mouseclickevent(event):
     global x, y
