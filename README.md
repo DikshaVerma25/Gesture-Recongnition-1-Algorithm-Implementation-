@@ -20,7 +20,7 @@ Line **1-3** the libraries are imported.<br>
 *B) Creating canvas*
 
 Line **6-7** Instance of Tk class is created which is stored in the variable root. And renaming the the canvas as Group 21. <br>
-Line **9-10** Instance of class "Canvas" is craeted which is stored in varible "canvas". Later the height and width are specified. Pack method helps in managing the canvas to occupy the space available in the window. 
+Line **9-10** Instance of class "Canvas" is created which is stored in varible "canvas". Later the height and width are specified. Pack method helps in managing the canvas to occupy the space available in the window. 
 
 *C) Using "mouseclickevent" and "draw" to enable drawing*
 
