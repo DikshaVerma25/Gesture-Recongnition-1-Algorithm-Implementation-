@@ -68,7 +68,7 @@ def on_release(self):
     global f
     f=f+1
     global points
-    print(points)
+    #print(points)
     line_array=[]
     line_array=resample(points,64) 
     redraw(line_array)
@@ -79,9 +79,9 @@ canvas.bind("<B1-Motion>", draw)
 # button release to capture/store/process thepython main.py points on the canvas on release of the button
 canvas.bind("<ButtonRelease>", on_release)
 
-#Adding eraser button
-erase_button = Button(root, text="Erase", command=lambda: canvas.delete("all"))
-erase_button.pack()
+# #Adding eraser button
+# erase_button = Button(root, text="Erase", command=lambda: canvas.delete("all"))
+# erase_button.pack()
 
 def distance(p1, p2):
     dx = p2[0] - p1[0]
