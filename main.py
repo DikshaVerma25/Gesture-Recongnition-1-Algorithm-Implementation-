@@ -2,7 +2,12 @@
 from tkinter import *
 import tkinter as tk
 
+global points
 points = []
+n=64
+# flag variable to reset the canvas when drawing a new gesture again
+global f
+f=0
 NumUnistrokes = 16
 num_unistrokes = NumUnistrokes
 unistrokes = [None] * num_unistrokes
@@ -33,27 +38,81 @@ root.title("Group 21")
 canvas = Canvas(root, width=700, height=700)
 canvas.pack()
 
+def redraw(line_array):
+   
+    canvas.create_line(line_array)
+    # x = event.x
+    # y = event.y
+    # points.append((x, y))
 
 def mouseclickevent(event):
     global x, y
+    global points,f
+    # points=[]
+    if f>1:
+        canvas.delete("all")
+    f=1
+    
     x, y = event.x, event.y
     points.append((x, y))
     
 def draw(event):
     global x, y
+    global points,f
     canvas.create_line((x, y, event.x, event.y),fill='red',width=4)
     x = event.x
     y = event.y
+    points.append((x, y))
 
-canvas.bind("<Button-1>", mouseclickevent)
+def on_release(self):
+    global f
+    f=f+1
+    global points
+    print(points)
+    line_array=[]
+    line_array=resample(points,64) 
+    redraw(line_array)
+    points=[] 
+
+canvas.bind("<ButtonPress>", mouseclickevent)
 canvas.bind("<B1-Motion>", draw)
-
+# button release to capture/store/process thepython main.py points on the canvas on release of the button
+canvas.bind("<ButtonRelease>", on_release)
 
 #Adding eraser button
 erase_button = Button(root, text="Erase", command=lambda: canvas.delete("all"))
 erase_button.pack()
 
+def distance(p1, p2):
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    return (dx**2 + dy**2)**0.5
+
+def path_length(points):
+    d = 0.0
+    for i in range(1, len(points)):
+        d += distance(points[i-1], points[i])
+    return d
 
 
-    
+def resample(points, n):
+    I = path_length(points) / (n - 1) # interval length
+    D = 0.0
+    newpoints = [points[0]]
+    for i in range(1, len(points)):
+        d = distance(points[i-1], points[i])
+        if D + d >= I:
+            qx = points[i-1][0] + ((I - D) / d) * (points[i][0] - points[i-1][0])
+            qy = points[i-1][1] + ((I - D) / d) * (points[i][1] - points[i-1][1])
+            q = (qx, qy)
+            newpoints.append(q) # append new point 'q'
+            points.insert(i, q) # insert 'q' at position i in points
+            D = 0.0
+        else:
+            D += d
+    if len(newpoints) == n - 1: # sometimes we fall a rounding-error short of adding the last point, so add it if so
+        newpoints.append(points[-1])
+    return newpoints
+
+
 root.mainloop()
