@@ -11,24 +11,40 @@ num_points =64
 global f
 f=0
 numUnistrokes = 16
+square_size = 250.0;
+origin = (0, 0)
+
 
 class Point:
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        
+
+#Creating this class named Rectangle so that after calculating the bounding box we can 
+# add the values while creating new.        
 class Rectangle:
     def __init__(self, x, y, width, height):
         self.X = x
         self.Y = y
         self.Width = width
         self.Height = height
-        
+ 
+ 
+ #Bounding Box is smallest rectangle that will enclose the gesture where array points is passed as parameter
+ # after initializing all the required variables it loopsthrough all the points resulting in the dimensions os the
+ # smallest rectangle by substracting the min values to max       
 def BoundingBox(points):
     minX = float("inf")
     maxX = float("-inf")
     minY = float("inf")
     maxY = float("-inf")
+    for i in range(len(points)):
+        minX = min(minX, points[i][0])
+        minY = min(minY, points[i][1])
+        maxX = max(maxX, points[i][0])
+        maxY = max(maxY, points[i][1])
+    return (minX, minY, maxX - minX, maxY - minY)
+
 
 
 class unistroke:
@@ -36,7 +52,7 @@ class unistroke:
         self.name = name
         self.Points = resample(points, num_points)
         radians = indicative_angle(self.Points)
-        self.Points = rotate_by(self.Points, -radians)
+        self.Points = rotate(self.Points, -radians)
         self.Points = scale_to(self.Points, square_size)
         self.Points = translate_to(self.Points, origin)
         self.Vector = vectorize(self.Points)
@@ -128,7 +144,8 @@ def path_length(points):
 
 #Function for resampling the points
 def resample(points, num_points):
-    I = path_length(points) / (num_points - 1) #calculating the total length of gesture and dividing to calculate
+    I = path_length(points) / (num_points - 1)
+    #calculating the total length of gesture and dividing to calculate
     #desired distence between each points
     D = 0.0
     newpoints = [points[0]]
@@ -165,8 +182,10 @@ def indicative_angle(points):
     c = centroid(points)
     return math.atan2(c[1] - points[0][1], c[0] - points[0][0])
 
-
-def rotate_by(points, radians):
+#This function is rotating the gesture to its centroid whose points are provided by a different function
+# Here it uses the cosine and sine values of radian angle for rotating whihc are then stored in a new_points array 
+# For each point we are substracting to centroid, then rotating and again adding the centroid back to new points
+def rotate(points, radians):
     c = centroid(points)
     cos = math.cos(radians)
     sin = math.sin(radians)
@@ -182,28 +201,19 @@ def rotate_by(points, radians):
     return new_points
 
 
-def scale_to(points, size):
-    B = BoundingBox(points)
+#This function helps to scale the gesture
+#It takes two inputs and then calls the BoundingBox function which returns points of new rectangle
+#After creating new array it it creates new coordiantes by multiplying original to scaling factor
+#Scaling factor is desire size (in this case is square size by width and height of bounding box)
+def scale_to(points, size): 
+    Des = BoundingBox(points)
     newpoints = []
     for i in range(len(points)):
-        qx = points[i].X * (size / B.Width)
-        qy = points[i].Y * (size / B.Height)
-        newpoints.append(Point(qx, qy))
+        xp = points[i].X * (size / Des.Width)
+        yp = points[i].Y * (size / Des.Height)
+        newpoints.append(Point(xp, yp))
     return newpoints
 
-def BoundingBox(points):
-    minX = float("inf")
-    maxX = float("-inf")
-    minY = float("inf")
-    maxY = float("-inf")
-    
-    for i in range(len(points)):
-        minX = min(minX, points[i].X)
-        minY = min(minY, points[i].Y)
-        maxX = max(maxX, points[i].X)
-        maxY = max(maxY, points[i].Y)
-        
-    return Rectangle(minX, minY, maxX - minX, maxY - minY)
 
 def vectorize(points):
     vector = []
