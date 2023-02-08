@@ -1,15 +1,47 @@
 #Importing the libraries
 from tkinter import *
 import tkinter as tk
+import math
+from typing import List
 
 global points
 points = []
-n=64
+num_points =64
 # flag variable to reset the canvas when drawing a new gesture again
 global f
 f=0
-NumUnistrokes = 16
-num_unistrokes = NumUnistrokes
+numUnistrokes = 16
+
+class Point:
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+        
+class Rectangle:
+    def __init__(self, x, y, width, height):
+        self.X = x
+        self.Y = y
+        self.Width = width
+        self.Height = height
+        
+def BoundingBox(points):
+    minX = float("inf")
+    maxX = float("-inf")
+    minY = float("inf")
+    maxY = float("-inf")
+
+
+class unistroke:
+    def __init__(self, name, points):
+        self.name = name
+        self.Points = resample(points, num_points)
+        radians = indicative_angle(self.Points)
+        self.Points = rotate_by(self.Points, -radians)
+        self.Points = scale_to(self.Points, square_size)
+        self.Points = translate_to(self.Points, origin)
+        self.Vector = vectorize(self.Points)
+
+num_unistrokes = numUnistrokes
 unistrokes = [None] * num_unistrokes
 unistrokes = [("triangle", [(137, 139), (135, 141), (133, 144), (132, 146), (130, 149), (128,151),(126,155),(123,160),(120,166),(116,171),(112,177),(107,183),(102,188),(100,191),(95,195),(90,199),(86,203),(82,206),(80,209),(75,213),(73,213),(70,216),(67,219),(64,221),(61,223),(60,225),(62,226),(65,225),(67,226),(74,226),(77,227),(85,229),(91,230),(99,231),(108,232),(116,233),(125,233),(134,234),(145,233),(153,232),(160,233),(170,234),(177,235),(179,236),(186,237),(193,238),(198,239),(200,237),(202,239),(204,238),(206,234),(205,230),(202,222),(197,216),(192,207),(186,198),(179,189),(174,183),(170,178),(164,171),(161,168),(154,160),(148,155),(143,150),(138,148),(136,148),(128,151),(126,155),(123,160),(120,166),(116,171),(112,177),(107,183),(102,188),(100,191),(95,195),(90,199),(86,203),(82,206),(80,209),(75,213),(73,213),(70,216),(67,219),(64,221),(61,223),(60,225),(62,226),(65,225),(67,226),(74,226),(77,227),(85,229),(91,230),(99,231),(108,232),(116,233),(125,233),(134,234),(145,233),(153,232),(160,233),(170,234),(177,235),(179,236),(186,237),(193,238),(198,239),(200,237),(202,239),(204,238),(206,234),(205,230),(202,222),(197,216),(192,207),(186,198),(179,189),(174,183),(170,178),(164,171),(161,168),(154,160),(148,155),(143,150),(138,148),(136,148)])];
 unistrokes = [("x",[(87,142),(89,145),(91,148),(93,151),(96,155),(98,157),(100,160),(102,162),(106,167),(108,169),(110,171),(115,177),(119,183),(123,189),(127,193),(129,196),(133,200),(137,206),(140,209),(143,212),(146,215),(151,220),(153,222),(155,223),(157,225),(158,223),(157,218),(155,211),(154,208),(152,200),(150,189),(148,179),(147,170),(147,158),(147,148),(147,141),(147,136),(144,135),(142,137),(140,139),(135,145),(131,152),(124,163),(116,177),(108,191),(100,206),(94,217),(91,222),(89,225),(87,226),(87,224)])];
@@ -76,7 +108,7 @@ def on_release(self):
 
 canvas.bind("<ButtonPress>", mouseclickevent)
 canvas.bind("<B1-Motion>", draw)
-# button release to capture/store/process thepython main.py points on the canvas on release of the button
+# button release to capture/store/process the python main.py points on the canvas on release of the button
 canvas.bind("<ButtonRelease>", on_release)
 
 # #Adding eraser button
@@ -94,9 +126,10 @@ def path_length(points):
         d += distance(points[i-1], points[i])
     return d
 
-
-def resample(points, n):
-    I = path_length(points) / (n - 1) # interval length
+#Function for resampling the points
+def resample(points, num_points):
+    I = path_length(points) / (num_points - 1) #calculating the total length of gesture and dividing to calculate
+    #desired distence between each points
     D = 0.0
     newpoints = [points[0]]
     for i in range(1, len(points)):
@@ -110,9 +143,94 @@ def resample(points, n):
             D = 0.0
         else:
             D += d
-    if len(newpoints) == n - 1: # sometimes we fall a rounding-error short of adding the last point, so add it if so
+    if len(newpoints) == num_points - 1: # sometimes we fall a rounding-error short of adding the last point, so add it if so
         newpoints.append(points[-1])
+    print(newpoints)   
     return newpoints
+    
+
+def centroid(points: List[Point]) -> Point:
+    xp = 0.0
+    yp = 0.0
+    for i in range(len(points)):
+        xp += points[i].X
+        yp += points[i].Y
+    xp /= len(points)
+    yp /= len(points)
+    print(Point)
+    return Point(xp, yp)
+    
+
+def indicative_angle(points):
+    c = centroid(points)
+    return math.atan2(c[1] - points[0][1], c[0] - points[0][0])
+
+
+def rotate_by(points, radians):
+    c = centroid(points)
+    cos = math.cos(radians)
+    sin = math.sin(radians)
+    new_points = []
+    for i in range(len(points)):
+        qx = (points[i][0] - c[0]) * cos - (points[i][1] - c[1]) * sin + c[0]
+        qy = (points[i][0] - c[0]) * sin + (points[i][1] - c[1]) * cos + c[1]
+        new_points.append((qx, qy))
+    for point in new_points:
+        x, y = point
+        canvas.create_oval(x - 5, y - 5, x + 5, y + 5, fill="blue")
+        
+    return new_points
+
+
+def scale_to(points, size):
+    B = BoundingBox(points)
+    newpoints = []
+    for i in range(len(points)):
+        qx = points[i].X * (size / B.Width)
+        qy = points[i].Y * (size / B.Height)
+        newpoints.append(Point(qx, qy))
+    return newpoints
+
+def BoundingBox(points):
+    minX = float("inf")
+    maxX = float("-inf")
+    minY = float("inf")
+    maxY = float("-inf")
+    
+    for i in range(len(points)):
+        minX = min(minX, points[i].X)
+        minY = min(minY, points[i].Y)
+        maxX = max(maxX, points[i].X)
+        maxY = max(maxY, points[i].Y)
+        
+    return Rectangle(minX, minY, maxX - minX, maxY - minY)
+
+def vectorize(points):
+    vector = []
+    sum = 0.0
+    for i in range(len(points)):
+        vector.append(points[i][0])
+        vector.append(points[i][1])
+        sum += points[i][0] * points[i][0] + points[i][1] * points[i][1]
+
+    magnitude = math.sqrt(sum)
+    for i in range(len(vector)):
+        vector[i] /= magnitude
+
+    return vector
+
+
+def translate_to(points, pt):
+    c = centroid(points)
+    newpoints = []
+    for i in range(len(points)):
+        qx = points[i][0] + pt[0] - c[0]
+        qy = points[i][1] + pt[1] - c[1]
+        newpoints.append((qx, qy))
+    return newpoints
+
+
+
 
 
 root.mainloop()
