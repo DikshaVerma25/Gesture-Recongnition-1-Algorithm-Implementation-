@@ -16,7 +16,7 @@ object1=cntrl.Recognizer(numUnistrokes)
 root = tk.Tk()
 root.title("Group 21")
 
-canvas = Canvas(root, width=700, height=700)
+canvas = Canvas(root, width=350, height=350)
 canvas.pack()
 
 global points,f
@@ -45,10 +45,14 @@ def mouseclickevent(event):
     
 def draw(event):
     global x, y,points,f
-    canvas.create_line((x, y, event.x, event.y),fill='red',width=4)
-    x = event.x
-    y = event.y
-    points.append((x, y))
+    if f==1:
+        canvas.create_line((x, y, event.x, event.y),fill='red',width=4)
+        x = event.x
+        y = event.y
+        points.append((x, y))
+    else:
+        canvas.delete("all")
+    
 
 def on_release(event):
     global f,points
@@ -56,11 +60,13 @@ def on_release(event):
     x, y = event.x, event.y
     points.append((x, y))
     print(len(points))
-    if len(points)>1:
+
+    if len(points)>=10:
         k=object1.Recognize(points,False)
         print("Answer: ",k.Name,k.Score)
    
     # print(cntrl.centroid(points))
+    
     points=[] 
 
 # button to start the drawing of a gesture and to add the starting point of a gesture to the points array

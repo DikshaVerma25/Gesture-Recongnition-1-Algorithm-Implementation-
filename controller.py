@@ -16,13 +16,14 @@ def Deg2Rad(d):
 
 numUnistrokes = 16
 num_points = 64
-square_size = 250.0
+square_size = 350.0
 origin = (0,0)
 Diagonal = math.sqrt(square_size * square_size + square_size * square_size)
 HalfDiagonal = 0.5 * Diagonal
-AngleRange = Deg2Rad(45.0)
-AnglePrecision = Deg2Rad(2.0)
-Phi = 0.5 * (-1.0 + math.sqrt(5.0)) 
+AngleRange = (2 / 180) * math.pi
+AnglePrecision = (2 / 180) * math.pi
+Phi =  0.5 * (-1.0 + (5.0)**0.5)
+ 
 
 
 class Point:
@@ -64,16 +65,7 @@ class Result:
         self.Time = time
 
 
-def distance(p1, p2):
-    dx = p2[0] - p1[0]
-    dy = p2[1] - p1[1]
-    return (dx**2 + dy**2)**0.5
 
-def path_length(points):
-    d = 0.0
-    for i in range(1, len(points)):
-        d += distance(points[i-1], points[i])
-    return d
 
 def PathDistance(pts1, pts2):
     d = 0.0
@@ -111,24 +103,23 @@ def optimal_cosine_distance(v1, v2):
 
 def DistanceAtBestAngle(points, T, a, b, threshold,Template1):
     phi = (math.sqrt(5) - 1) / 2
-    x1 = phi * a + (1 - phi) * b
+    x1 = phi*a + (1 - phi)*b
     f1 = DistanceAtAngle(points, T, x1,Template1)
-    x2 = (1 - phi) * a + phi * b
+    x2 = phi*b +(1 - phi)*a
     f2 = DistanceAtAngle(points, T, x2,Template1)
     while abs(b - a) > threshold:
-        if f1!=None and f2!=None:
-            if  f1 < f2:
-                b = x2
-                x2 = x1
-                f2 = f1
-                x1 = phi * a + (1 - phi) * b
-                f1 = DistanceAtAngle(points, T, x1,Template1)
-            else:
-                a = x1
-                x1 = x2
-                f1 = f2
-                x2 = (1 - phi) * a + phi * b
-                f2 = DistanceAtAngle(points, T, x2,Template1)
+        if  f1 < f2:
+            b = x2
+            x2 = x1
+            f2 = f1
+            x1 = phi * a + (1 * phi) * b
+            f1 = DistanceAtAngle(points, T, x1,Template1)
+        else:
+            a = x1
+            x1 = x2
+            f1 = f2
+            x2 = (1 - phi) * a + phi * b
+            f2 = DistanceAtAngle(points, T, x2,Template1)
     return min(f1, f2)
 
 def DistanceAtAngle(points, T, radians,Template1):
@@ -140,56 +131,82 @@ def DistanceAtAngle(points, T, radians,Template1):
 
 
 
-#Function for resampling the points
-def resample(points, num_points):
-    I = path_length(points) / (num_points - 1)
-    #calculating the total length of gesture and dividing to calculate
-    #desired distence between each points
-    D = 0.0
-    newpoints = [points[0]]
-    try:
-        for i in range(1, len(points)):
-            d = distance(points[i-1], points[i])
-            if D + d >= I:
-                qx = points[i-1][0] + ((I - D) / d) * (points[i][0] - points[i-1][0])
-                qy = points[i-1][1] + ((I - D) / d) * (points[i][1] - points[i-1][1])
-                q = (qx, qy)
-                newpoints.append(q) # append new point 'q'
-                points.insert(i, q) # insert 'q' at position i in points
-                D = 0.0
-            else:
-                D += d
+def resample(points,N):
+    M=totalpathlength(points)
+    # I is the interval length
+    I=0.0
+    I=M/63
+    D=0.0
+    newpoints=[points[0]]
     
-        if len(newpoints) == num_points - 1: # sometimes we fall a rounding-error short of adding the last point, so add it if so
-            newpoints.append(points[-1])
-        return newpoints
-    except:
-        print(" resample: draw valid gesture")
+    i = 1
+    while i < len(points):
+        p, cur = points[i - 1:i + 1]
+        d = distance(p, cur)
+        if ((D + d) >= I):
+            q = (p[0] + ((I - D) / d) * (cur[0] - p[0]),
+                    p[1] + ((I - D) / d) * (cur[1] - p[1]))
+            # append new point 'q'
+            newpoints.append(q)
+            # insert 'q' at position i in points s.t. 'q' will be the next i
+            points.insert(i, q)
+            D = 0
+        else:
+            D += d
+        i += 1
+    # somtimes we fall a rounding-error short of adding the last point, so
+    # add it if so
+    if len(newpoints) == 63:
+        newpoints.append(newpoints[-1])
+    points = newpoints
+    print("kk",len(points))
+    return points
+
+
+
+
+
+def totalpathlength(points):
+    d=0.0
+    for i in range(1,len(points)):
+        print("tpl ",i,d)
+        d=float(d+distance(points[i-1],points[i]))
+    return d
+
+def distance(pt1,pt2):
+    d=0.0
+    dx=float(pt2[0]-pt1[0])
+    dy=float(pt2[1]-pt2[1])
+    d=float(math.sqrt((dx*dx)+(dy*dy)))
+    return d
+
     
 
-def centroid(points):
-    xp = 0.0
-    yp = 0.0
-    try:
-        for i in range(len(points)):
-            xp += points[i][0]
-            yp += points[i][1]
-        xp /= len(points)
-        yp /= len(points)
+# def centroid(points):
+#     xp = 0.0
+#     yp = 0.0
+#     try:
+#         for i in range(len(points)):
+#             xp += points[i][0]
+#             yp += points[i][1]
+#         xp /= len(points)
+#         yp /= len(points)
     
 
-        return Point(xp, yp)
-    except:
-        print("centroid: enter a valid gesture")
-    
+#         return Point(xp, yp)
+#     except:
+#         print("centroid: enter a valid gesture")
 
+def centroid(points) :
+    return (
+            sum([p[0] / len(points) for p in points]),
+            sum([p[1] / len(points) for p in points])
+        ) 
 def indicative_angle(points):
-    try:
-        c = centroid(points)
-
-        return math.atan2(c.Y - points[0][1], c.X - points[0][0])
-    except:
-        print("indicative_angle: valid gesture ")
+  
+    c = centroid(points)
+    return math.atan2(c[1] - points[0][1], c[0] - points[0][0])
+    
 
 #This function is rotating the gesture to its centroid whose points are provided by a different function
 # Here it uses the cosine and sine values of radian angle for rotating whihc are then stored in a new_points array 
@@ -198,13 +215,15 @@ def rotate(points, radians):
     c = centroid(points)
     cos = math.cos(radians)
     sin = math.sin(radians)
-    new_points = []
-    for i in range(len(points)):
-        qx = (points[i][0] - c.X) * cos - (points[i][1] - c.Y) * sin + c.X
-        qy = (points[i][0] - c.X) * sin + (points[i][1] - c.Y) * cos + c.Y
-        new_points.append((qx, qy))
+    newpoints = []
+    for p in points:
+        dx,dy=p[0]-c[0],p[1]-c[1]
         
-    return new_points
+        qx = dx * cos - dy * sin + c[0]
+        qy = dx * sin + dy * cos + c[1]
+        newpoints.append((qx, qy))
+    points=newpoints  
+    return points
 
 
 #This function helps to scale the gesture
@@ -212,17 +231,15 @@ def rotate(points, radians):
 #After creating new array it it creates new coordiantes by multiplying original to scaling factor
 #Scaling factor is desire size (in this case is square size by width and height of bounding box)
 def scale_to(points, size): 
-    Des = BoundingBox(points)
+    box = BoundingBox(points)
     newpoints = []
-    try:
-        for i in range(len(points)):
-            xp = points[i][0] * (size / Des.Width)
-            yp = points[i][1] * (size / Des.Height)
-            newpoints.append((xp, yp))
+    for i in range(len(points)):
+        xp = points[i][0] * size / box.Width
+        yp = points[i][1] * size / box.Height
+        newpoints.append((xp, yp))
+
+    return newpoints
     
-        return newpoints
-    except:
-        print("scale_to: draw a valid gesture")
 
 
 def vectorize(points):
@@ -244,24 +261,24 @@ def translate_to(points, pt):
     c = centroid(points)
     newpoints = []
     for i in range(len(points)):
-        qx = points[i][0] + pt[0] - c.X
-        qy = points[i][1] + pt[1] - c.Y
+        qx = points[i][0] + pt[0] - c[0]
+        qy = points[i][1] + pt[1] - c[1]
         newpoints.append((qx, qy))
-    return newpoints
+    points=newpoints
+    return points
 
 class unistroke:
     try:
        
         def __init__(self, name, points):
-            if len(points)>3:
+           
                 self.name = name
                 self.Points = resample(points, num_points)
-                if len(self.Points)>0:
-                    radians = indicative_angle(self.Points)
-                    self.Points = rotate(self.Points, -radians)
-                    self.Points = scale_to(self.Points, square_size)
-                    self.Points = translate_to(self.Points, origin)
-                    self.Vector = vectorize(self.Points)
+                radians = indicative_angle(self.Points)
+                self.Points = rotate(self.Points, -radians)
+                self.Points = scale_to(self.Points, square_size)
+                self.Points = translate_to(self.Points, origin)
+                self.Vector = vectorize(self.Points)
     except:
         print("unistroke: valid gesture")
 
@@ -322,29 +339,27 @@ class Recognizer:
             self.HalfDiagonal = HalfDiagonal
 
         def Recognize(self, points, useProtractor):
-            try:
-            
-                t0 = time.time()
-                candidate = unistroke("", points)
-                u = -1
-                b = float("inf")
-                for i in range(len(self.Unistrokes)):
-                    
-                    if useProtractor:
-                        d = optimal_cosine_distance(Unistrokes[i].Vector, candidate.Vector)
-                    else:
-                        d = DistanceAtBestAngle(candidate.Points, Unistrokes[i].Points, -self.AngleRange, +self.AngleRange, self.AnglePrecision,Unistrokes[i])
-                    if d!=None and b!=None and  d < b:
-                        b = d
-                        u = i
-
-                t1 = time.time()
-                if u == -1:
-                    return Result("No match.", 0.0, t1-t0)
+            t0 = time.time()
+            candidate = unistroke("", points)
+            u = -1
+            b = float("inf")
+            for i in range(len(self.Unistrokes)):
+                
+                if useProtractor:
+                    d = optimal_cosine_distance(Unistrokes[i].Vector, candidate.Vector)
                 else:
-                    return Result(Unistrokes[u].name, 1.0 - b / self.HalfDiagonal if not useProtractor else 1.0 - b, t1-t0)
-            except:
-                print("recog: enter gesture ")
+                    d = DistanceAtBestAngle(candidate.Points, Unistrokes[i].Points, -self.AngleRange, +self.AngleRange, self.AnglePrecision,Unistrokes[i])
+                # if d!=None and b!=None and  
+                if d < b:
+                    b = d
+                    u = i
+
+            t1 = time.time()
+            if u == -1:
+                return Result("No match.", 0.0, t1-t0)
+            else:
+                return Result(Unistrokes[u].name, 1.0 - b / self.HalfDiagonal if not useProtractor else 1.0 - b, t1-t0)
+        
 
         def AddGesture(self, name, points):
             self.Unistrokes.append(unistroke(name, points))
@@ -358,82 +373,5 @@ class Recognizer:
             self.Unistrokes = self.Unistrokes[:self.NumUnistrokes]
             return self.NumUnistrokes
     
-
-
-# def distance(p1, p2):
-#     dx = p2[0] - p1[0]
-#     dy = p2[1] - p1[1]
-#     return (dx**2 + dy**2)**0.5
-
-# def path_length(points):
-#     d = 0.0
-#     for i in range(1, len(points)):
-#         d += distance(points[i-1], points[i])
-#     return d
-
-# def PathDistance(pts1, pts2):
-#     d = 0.0
-#     try:
-#         if len(pts1)<len(pts2):
-#             for i in range(len(pts1)): # assumes pts1.length == pts2.length
-#                 d += distance(pts1[i], pts2[i])
-#         else:
-#             for i in range(len(pts2)): # assumes pts1.length == pts2.length
-#                 d += distance(pts1[i], pts2[i])
-            
-#         return d / len(pts1)
-#     except:
-#         print("PathDistance","enter valid gesture")
-
-
-
-
-
-
-# def optimal_cosine_distance(v1, v2):
-#     a = 0.0
-#     b = 0.0
-#     try:
-#         for i in range(0, len(v1), 2):
-#             a += v1[i] * v2[i] + v1[i+1] * v2[i+1]
-#             b += v1[i] * v2[i+1] - v1[i+1] * v2[i]
-  
-#         angle = math.atan(b / a)
-#         return math.acos(a * math.cos(angle) + b * math.sin(angle))
-#     except:
-#         print(" optimal_cosine_distance: draw a valid gesture")
-    
-
-
-# def DistanceAtBestAngle(points, T, a, b, threshold,Template1):
-#     phi = (math.sqrt(5) - 1) / 2
-#     x1 = phi * a + (1 - phi) * b
-#     f1 = DistanceAtAngle(points, T, x1,Template1)
-#     x2 = (1 - phi) * a + phi * b
-#     f2 = DistanceAtAngle(points, T, x2,Template1)
-#     while abs(b - a) > threshold:
-#         if f1!=None and f2!=None:
-#             if  f1 < f2:
-#                 b = x2
-#                 x2 = x1
-#                 f2 = f1
-#                 x1 = phi * a + (1 - phi) * b
-#                 f1 = DistanceAtAngle(points, T, x1,Template1)
-#             else:
-#                 a = x1
-#                 x1 = x2
-#                 f1 = f2
-#                 x2 = (1 - phi) * a + phi * b
-#                 f2 = DistanceAtAngle(points, T, x2,Template1)
-#     return min(f1, f2)
-
-# def DistanceAtAngle(points, T, radians,Template1):
-#     newpoints = rotate(points, radians)
-#     print("T******",Template1.name,len(T),len(newpoints))
-#     return PathDistance(newpoints, T)
-
-
-
-
 
 
