@@ -7,7 +7,7 @@ from typing import List
 import controller as cntrl
 numUnistrokes = 16
 
-
+# initializing the controller class
 object1=cntrl.Recognizer(numUnistrokes)
 
 
@@ -62,10 +62,14 @@ def on_release(event):
     print(len(points))
 
     if len(points)>=10:
+        # caaling the recgonize function in COntroller Class
         k=object1.Recognize(points,False)
+
+        # K will have Name of the gesture type stored after recognition
         print("Answer: ",k.Name,k.Score)
+    else:
+        print("Very few points")
    
-    # print(cntrl.centroid(points))
     
     points=[] 
 
