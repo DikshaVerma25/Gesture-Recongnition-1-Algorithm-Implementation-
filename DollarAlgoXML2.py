@@ -297,8 +297,9 @@ class Input:
     #     return processed_xml_files
 
     def preprocessALLGestures1(self,data):
+        
         numUsers=len(data[0][0])
-        numSpeed=len(data[1][0])
+        #numSpeed=len(data[1][0])
         numGestures=len(data[1][1][1][1])
         numForEachGesture=len(data[1][1][1][1][1][1])
         c=0
@@ -343,7 +344,10 @@ class Input:
                 
                 # [print("Raja=====",len(temp[1])) for temp in Templates1]
                 result=self.rec_ges(cd,Templates1) 
+                print(numForEachGesture)
+                print(numUsers)
                 print("result####################################################################### ",result,na)
+                #print(data)
 
                 
 
