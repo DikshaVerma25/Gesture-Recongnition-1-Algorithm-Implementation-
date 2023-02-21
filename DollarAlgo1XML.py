@@ -4,63 +4,68 @@ from math import pi, atan2, cos, sin, inf
 import time,math
 import xml.etree.ElementTree as ET
 import os
+import filestruct as filest
+import random
 text = os.getcwd()
-hj=0
-data = []
-points1=[]
-seasons = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
+# hj=0
+# data = []
+# points1=[]
+# seasons = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
 
-gestures = ["arrow", "caret" , "check" , "circle" , "delete" , "left-curly_brace" , "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" , "star", "triangle" , "v" , "x"]
-m={}
-for sname in seasons:
-    directory = text + '/xml_logs/'+sname+'/medium'
+# gestures = ["arrow", "caret" , "check" , "circle" , "delete" , "left-curly_brace" , "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" , "star", "triangle" , "v" , "x"]
+# m={}
+# # filestructure=[]
+# for sname in seasons:
+#     directory = text + '/xml_logs/'+sname+'/medium'
 
-    for filename in os.listdir(directory):
-        # directory.join('/s01/medium/')cd  
-        if filename.endswith('.xml'):
-            # build the full path to the XML file
-            filepath = os.path.join(directory, filename)
+#     for filename in os.listdir(directory):
+#         # directory.join('/s01/medium/')cd  
+#         if filename.endswith('.xml'):
+#             # build the full path to the XML file
+#             filepath = os.path.join(directory, filename)
             
-            # parse the XML file
-            tree = ET.parse(filepath)
+#             # parse the XML file
+#             tree = ET.parse(filepath)
             
-            # get the root element
-            root = tree.getroot()
+#             # get the root element
+#             root = tree.getroot()
             
-            # print('XML file:', filepath)
-            gesname=filepath.replace(directory+"\\","")
-            ges=gesname[:-6]
-            # print("&&&&&&&   "+ges)
-            # do something with the data from the XML file
-            # for example, print the tag and text of each element
+#             # print('XML file:', filepath)
+#             gesname=filepath.replace(directory+"\\","")
+#             ges=gesname[:-6]
+#             # print("&&&&&&&   "+ges)
+#             # do something with the data from the XML file
+#             # for example, print the tag and text of each element
             
-            # if ges not in m:
-            #     m[ges]=
-            # for child in root:
-            #     item = {}
-            #     for key, value in child.attrib.items():
-            #         item[key] = value
-            #     data.append(item)
+#             # if ges not in m:
+#             #     m[ges]=
+#             # for child in root:
+#             #     item = {}
+#             #     for key, value in child.attrib.items():
+#             #         item[key] = value
+#             #     data.append(item)
             
-        # if hj<2:
-            for point in root.findall(".//Point"):
-                x = int(point.attrib["X"])
-                y = int(point.attrib["Y"])
-                points1.append([x, y])
-            # print("^^^",points1)
-        
-            if ges not in m:
-                m[ges]=[points1]
-            else:
-                arr=m[ges]
-                arr.append(points1)
-            # hj=hj+1
-            points1=[]
+#         if hj<2:
+#             for point in root.findall(".//Point"):
+#                 x = int(point.attrib["X"])
+#                 y = int(point.attrib["Y"])
+#                 points1.append([x, y])
+#             # print("^^^",points1)
+            
+            
+
+#             if ges not in m:
+#                 m[ges]=[points1]
+#             else:
+#                 arr=m[ges]
+#                 arr.append(points1)
+#             hj=hj+1
+#             points1=[]
 
     
-    # append the dictionary to the list
-p=m["arrow"]
-print("file: ",p, len(p))   
+#     # append the dictionary to the list
+# p=m["arrow"]
+# print("file: ",p, len(p))   
 # import json
 
 # with open('output.txt', 'w') as filehandle:
@@ -68,6 +73,9 @@ print("file: ",p, len(p))
 
 # Template points will be stored in UNISTROKE variable
 # List of List is being used to store the template points
+xmlfiles=filest.XMLfolder().xmlfiles
+# print("&&&&&& ",len(xmlfiles),len(xmlfiles[0]),len(xmlfiles[0][0]),len(xmlfiles[0][0][0][0]),xmlfiles[0][0][0][0])
+preprocessedmap={}
 UNISTROKES = [("triangle", [[137, 139],[135, 141],[133, 144],[132, 146],[130, 149],[128, 151],[126, 155],[123, 160],[120, 166],[116, 171],[112, 177],[107, 183],[102, 188],[100, 191],[95, 195],[90, 199],[86, 203],[82, 206],[80, 209],[75, 213],[73, 213],[70, 216],[67, 219],[64, 221],[61, 223],[60, 225],[62, 226],[65, 225],[67, 226],[74, 226],[77, 227],[85, 229],[91, 230],[99, 231],[108, 232],[116, 233],[125, 233],[134, 234],[145, 233],[153, 232],[160, 233],[170, 234],[177, 235],[179, 236],[186, 237],[193, 238],[198, 239],[200, 237],[202, 239],[204, 238],[206, 234],[205, 230],[202, 222],[197, 216],[192, 207],[186, 198],[179, 189],[174, 183],[170, 178],[164, 171],[161, 168],[154, 160],[148, 155],[143, 150],[138, 148],[136, 148]]),("x", [[87, 142],[89, 145],[91, 148],[93, 151],[96, 155],[98, 157],[100, 160],[102, 162],[106, 167],[108, 169],[110, 171],[115, 177],[119, 183],[123, 189],[127, 193],[129, 196],[133, 200],[137, 206],[140, 209],[143, 212],[146, 215],[151, 220],[153, 222],[155, 223],[157, 225],[158, 223],[157, 218],[155, 211],[154, 208],[152, 200],[150, 189],[148, 179],[147, 170],[147, 158],[147, 148],[147, 141],[147, 136],[144, 135],[142, 137],[140, 139],[135, 145],[131, 152],[124, 163],[116, 177],[108, 191],[100, 206],[94, 217],[91, 222],[89, 225],[87, 226],[87, 224]]),
 ("rectangle", [[78, 149],[78, 153],[78, 157],[78, 160],[79, 162],[79, 164],[79, 167],[79, 169],[79, 173],[79, 178],[79, 183],[80, 189],[80, 193],[80, 198],[80, 202],[81, 208],[81, 210],[81, 216],[82, 222],[82, 224],[82, 227],[83, 229],[83, 231],[85, 230],[88, 232],[90, 233],[92, 232],[94, 233],[99, 232],[102, 233],[106, 233],[109, 234],[117, 235],[123, 236],[126, 236],[135, 237],[142, 238],[145, 238],[152, 238],[154, 239],[165, 238],[174, 237],[179, 236],[186, 235],[191, 235],[195, 233],[197, 233],[200, 233],[201, 235],[201, 233],[199, 231],[198, 226],[198, 220],[196, 207],[195, 195],[195, 181],[195, 173],[195, 163],[194, 155],[192, 145],[192, 143],[192, 138],[191, 135],[191, 133],[191, 130],[190, 128],[188, 129],[186, 129],[181, 132],[173, 131],[162, 131],[151, 132],[149, 132],[138, 132],[136, 132],[122, 131],[120, 131],[109, 130],[107, 130],[90, 132],[81, 133],[76, 133]]),
 ("circle", [[127, 141],[124, 140],[120, 139],[118, 139],[116, 139],[111, 140],[109, 141],[104, 144],[100, 147],[96, 152],[93, 157],[90, 163],[87, 169],[85, 175],[83, 181],[82, 190],[82, 195],[83, 200],[84, 205],[88, 213],[91, 216],[96, 219],[103, 222],[108, 224],[111, 224],[120, 224],[133, 223],[142, 222],[152, 218],[160, 214],[167, 210],[173, 204],[178, 198],[179, 196],[182, 188],[182, 177],[178, 167],[170, 150],[163, 138],[152, 130],[143, 129],[140, 131],[129, 136],[126, 139]]),
@@ -247,6 +255,7 @@ class Gesture:
 
     def path_distance(self, points):
         n = len(points)
+        #print("###########################################################################",n)
         return sum([distance(self.points[i], points[i]) / n for i in range(n)])
 
 
@@ -258,21 +267,197 @@ def distance(p1, p2):
 
 class Input:
     # Preprocess the template points e.g resample,rotate, scale to and translate
-
+    
+    # processed_xml_files=[]
     def __init__(self):
         # format the example gestures
         t0 = time.time()
+        self.processed_xml_files=[]
+        self.processed_xml_files=self.preprocessALLGestures1(xmlfiles)
+        # a = [len(self.processed_xml_files[i1][i2][i3][i4]) for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
+        # print(a)
+        # self.unistrokes = []
+        # for template in Templates:
+        #     self.unistrokes.append(Gesture(template[1]))
+        #     self.unistrokes[-1].name = template[0]
+        # if f:
+        self.random_100(self.processed_xml_files)
+        # print("777777",self.processed_xml_files[0][0][0][0])
+        
+   
+    # def preprocessALLGestures(self,m):
+    #     for gestureName in m:
+    #         for gesturetypearray in m[gestureName]:
+    #             # print("***",gesturetypearray)
 
-        self.unistrokes = []
-        for template in UNISTROKES:
-            self.unistrokes.append(Gesture(template[1]))
-            self.unistrokes[-1].name = template[0]
-        print("check for the input",self.unistrokes[3])
-        print(len(UNISTROKES[3][1]))
-        Gesture(UNISTROKES[3][1])
+    #             arr=Gesture(gesturetypearray)
+    #             # print("^^^^",arr.points)
 
-    # recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
-    def rec_ges(self, points):
+    #             if gestureName not in preprocessedmap:
+    #                 preprocessedmap[gestureName]=[arr.points]
+    #             else:
+    #                 preprocessedmap[gestureName].append(arr.points)
+                
+    #         break
+    #     print("*******",preprocessedmap["arrow"][0])
+    def preprocessALLGestures1(self,xmlfiles):
+        processed_xml_files=[]
+
+        for user in range(len(xmlfiles)):
+            p=[]
+            for speed in range(len(xmlfiles[user])):
+                q=[]
+                for g in range(len(xmlfiles[user][speed])):
+                    r=[]
+                    for t in range(len(xmlfiles[user][speed][g])):
+                        arr=Gesture(xmlfiles[user][speed][g][t])
+                        print("---------",len(arr.points))
+                        r.append(arr.points)
+                    q.append(r)
+                p.append(q)
+            processed_xml_files.append(p)
+        return processed_xml_files
+            
+                
+    # def random_100(self):
+    #     pace=1
+    #     Users = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
+    #     SpeedArray=["fast","medium","slow"]
+    #     gestures = ["arrow", "caret" , "check" , "circle" , "delete_mark" , "left_curly_brace" , "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" , "star", "triangle" , "v" , "x"]
+    #     gesturetypenumber=["01","02","03","04","05","06","07","08","09","10"]
+    #     for user in range(len(self.processed_xml_files)):
+           
+
+    #             for g in range(len(self.processed_xml_files[user][pace])):
+    #                 # for i in range(100):
+    #                 # Candidate=self.processed_xml_files[user][pace][g][r]
+    #                 Templates=[]
+    #                 r=random.randint(0,9)
+    #                 for t in range(9):
+                        
+
+    #                     if r!=t:
+    #                         str=gestures[g]+gesturetypenumber[t]
+    #                         Templates.append((str,self.processed_xml_files[user][pace][g][t]))
+    #                         # print("Templates^^^ ",Templates)
+    #                 for k in range(1,g):
+    #                     Candidate=self.processed_xml_files[user][pace][k][r]
+    #                     print("template size******",len(Templates))
+    #                     result=self.rec_ges(Candidate,Templates) 
+    #                     print("$$$$$$$$$$ ",result) 
+                    
+                
+    # def random_100(self):
+    #     pace=1
+    #     Users = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
+    #     SpeedArray=["fast","medium","slow"]
+    #     gestures = ["arrow", "caret" , "check" , "circle" , "delete_mark" , "left_curly_brace" , "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" , "star", "triangle" , "v" , "x"]
+    #     gesturetypenumber=["01","02","03","04","05","06","07","08","09","10"]
+    #     a = [len(self.processed_xml_files[i1][i2][i3][i4])for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
+        
+    #     print(a)
+        
+    #     for user in range(len(self.processed_xml_files)):
+
+    #         for t in range(9):      
+    #             Templates=[]
+    #             r=random.randint(0,9)  
+    #             if r!=t:
+
+    #                 for g in range(len(self.processed_xml_files[user][pace])):
+    #                         str=gestures[g]+gesturetypenumber[t]
+    #                         print("here", len(self.processed_xml_files[user][pace][g][t]), user,g,t)
+    #                         Templates.append((str,self.processed_xml_files[user][pace][g][t]))
+    #                 for k in range(len(self.processed_xml_files[user][pace])):
+    #                     Candidate=self.processed_xml_files[user][pace][k][r]
+    #                     print(user,pace,k,r)
+    #                     a = [len(Templates[temp][1]) for temp in range(len(Templates))]
+    #                     print("Candidate size******",len(Candidate))
+    #                     print("template size******",a)
+    #                     # s=self.Input(Templates,False)
+    #                     self.unistrokes = []
+    #                     for template in Templates:
+    #                         self.unistrokes.append(Gesture(template[1]))
+    #                         self.unistrokes[-1].name = template[0]
+    #                     result=self.rec_ges(Candidate, self.unistrokes) 
+    #                     print("$$$$$$$$$$ ",result) 
+                
+    def random_100(self,processed_xml_files):
+        pace=1
+        Users = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
+        SpeedArray=["fast","medium","slow"]
+        gestures = ["arrow", "caret" , "check" , "circle" , "delete_mark" , "left_curly_brace" ,"left_sq_bracket", "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" ,"right_sq_bracket", "star", "triangle" , "v" , "x"]
+        gesturetypenumber=["01","02","03","04","05","06","07","08","09","10"]
+        # a = [len(processed_xml_files[i1][i2][i3][i4])for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
+        
+        # print(a)
+        
+        for user in range(len(processed_xml_files)):
+
+            for t in range(0,9):      
+                Templates=[]
+                r=random.randint(0,9)  
+                if r!=t:
+
+                    for g in range(len(processed_xml_files[user][pace])):
+                            str=gestures[g]+gesturetypenumber[t]
+                            print("here", len(processed_xml_files[user][pace][g][t]), user,g,t)
+                            Templates.append((str,processed_xml_files[user][pace][g][t]))
+                    for k in range(len(processed_xml_files[user][pace])):
+                        str1=gestures[k]+gesturetypenumber[r]
+
+                        Candidate=processed_xml_files[user][pace][k][r]
+                        print("Candidate name ",str1)
+                        print(user,pace,k,r)
+                        a = [len(Templates[temp][1]) for temp in range(len(Templates))]
+                        print("Candidate size******",len(Candidate))
+                        print("template size******",a)
+                        if len(Templates[0][1])>64:
+                            self.unistrokes = []
+                            ti=[]
+                            for template in Templates:
+                                l=Gesture(template[1])
+                                ti.append((template[0],l.points))
+                            Templates=ti
+                        result=self.rec_ges(Candidate, Templates) 
+                        print("$$$$$$$$$$ ",result) 
+                
+
+                    
+                
+            
+                            
+
+
+
+
+
+       
+    
+
+
+    # # recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
+    # def rec_ges(self, points,Templates):
+
+    #     # here the call to gesture class will preprocess the candidate points
+    #     t0 = time.time()
+
+    #     ges = Gesture(points)
+    #     b = inf
+    #     result = ''
+    #     for template_stroke in Templates:
+    #         # returns the distance between candidate points and the template points after preprocessing
+    #         d = ges.distance_at_best_angle(template_stroke.points)
+
+    #         # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
+    #         if d < b:
+    #             # update the pt2 best gesture
+    #             b = d
+    #             result = template_stroke.name
+            
+    #     return (result,1.0 - b / HalfDiagonal)
+  # recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
+    def rec_ges(self, points,Templates):
 
         # here the call to gesture class will preprocess the candidate points
         t0 = time.time()
@@ -280,18 +465,22 @@ class Input:
         ges = Gesture(points)
         b = inf
         result = ''
-        for template_stroke in self.unistrokes:
+        k=[]
+        for template_stroke in Templates:
             # returns the distance between candidate points and the template points after preprocessing
-            d = ges.distance_at_best_angle(template_stroke.points)
+            d = ges.distance_at_best_angle(template_stroke[1])
 
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
+            result1 = template_stroke[0]
             if d < b:
                 # update the pt2 best gesture
                 b = d
-                result = template_stroke.name
-            
-        return (result,1.0 - b / HalfDiagonal)
+                result = template_stroke[0]
+                k.append((result,1.0 - b / HalfDiagonal))
 
+                
+        print("k @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",k) 
+        return (result,1.0 - b / HalfDiagonal)
 
 
 class Can:
@@ -364,17 +553,18 @@ class Can:
         f=f+1
         x, y = event.x, event.y
         points.append((x, y))
-        print(points)
+        # print(points)
         if(len(points) >=10):
             
             obj=Input()
-            rest= obj.rec_ges(points)
-            print("***",rest)
-            #canvas.create_text(100, 100, text= obj.rec_ges(points))
-            result=rest[0]+"("+str(rest[1])+")"
-            self.text_widget.insert("1.0", result)
-        else:
-            self.text_widget.insert("1.0", "Very Few points")
+
+        #     rest= obj.rec_ges(points)
+        #     print("***",rest)
+        #     #canvas.create_text(100, 100, text= obj.rec_ges(points))
+        #     result=rest[0]+"("+str(rest[1])+")"
+        #     self.text_widget.insert("1.0", result)
+        # else:
+        #     self.text_widget.insert("1.0", "Very Few points")
         
         
         points=[] 
