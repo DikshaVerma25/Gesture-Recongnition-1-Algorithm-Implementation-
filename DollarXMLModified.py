@@ -29,26 +29,25 @@ phi = 0.5 * (-1.0 + (5.0)**0.5)
 Diagonal = math.sqrt(square_size * square_size + square_size * square_size)
 HalfDiagonal = 0.5 * Diagonal
 
+class Recognize:
+    def preprocess(pointse):
+        g=Gesture()
+        p=g.resample(pointse)
+        p1=g.rotateTo(-g.indicative_angle(p),p)
+        p2=g.scale_to(square_size,p1)
+        p3=g.translate_to(origin,p2)
+        return p3
+        
 
 class Gesture:
-    
-    def __init__(self, pointsd, flag=True):
-        self.pointse = pointsd
-        if flag:
-            # preprocessing the candidate points or the template points based on the initialized call
-            print("Gesture here check",len(self.resample()))
-            
-            self.rotateTo(-self.indicative_angle())
-            self.scale_to(square_size)
-            self.translate_to(origin)
 
 #This is done by calculating the desired distance between the points and resampling it in such a way that there are total 64 points.
 # the resampling function will calculatethe distance between two adjacent points and if the distance is greater than the set interval I,
 # at each interval I ,it will add a new point.
 # the candidate and templategestures will have same number of points
-    def resample(self):
-        points = self.pointse
-        I = self.path_length() / (num - 1)
+    def resample(self,pointse):
+        points = pointse
+        I = self.path_length(pointse) / (num - 1)
         D = 0
         new_points = [points[0]]
         i = 1
@@ -57,7 +56,7 @@ class Gesture:
             d = distance(pt1, pt2)
             if ((D + d) >= I):
                 q = (pt1[0] + ((I - D) / d) * (pt2[0] - pt1[0]),
-                     pt1[1] + ((I - D) / d) * (pt2[1] - pt1[1]))
+                    pt1[1] + ((I - D) / d) * (pt2[1] - pt1[1]))
                 # append new point 'q'
                 new_points.append(q)
                 # insert 'q' at position i in points s.t. 'q' will be the next i
@@ -70,29 +69,29 @@ class Gesture:
         # add it if so
         if len(new_points) == num - 1:
             new_points.append(new_points[-1])
-        self.pointse = new_points
-        return self.pointse
+        pointse = new_points
+        return pointse
 
 
 #The length of the path of gesture is calculated using this method
 # the distance between two adajcent points is calculated and added to the total distance d to get the path length
-    def path_length(self):
+    def path_length(self,pointse):
         d = 0
-        for i in range(1, len(self.pointse)):
-            d += distance(self.pointse[i - 1], self.pointse[i])
+        for i in range(1, len(pointse)):
+            d += distance(pointse[i - 1], pointse[i])
         return d
 # this will calculate the centroid and compute the angle with respect to the X axis and the centroid line between c(x,y)and points(x,y)
-    def indicative_angle(self):
+    def indicative_angle(self,pointse):
         # angle formed by (points[0], centroid) and the horizon
-        c = self.centroid()
-        return atan2(c[1] - self.pointse[0][1], c[0] - self.pointse[0][0])
+        c = self.centroid(pointse)
+        return atan2(c[1] - pointse[0][1], c[0] - pointse[0][0])
 
 
-    def centroid(self):
-        n = len(self.pointse)
+    def centroid(self,pointse):
+        n = len(pointse)
         return (
-            sum([p[0] / n for p in self.pointse]),
-            sum([p[1] / n for p in self.pointse])
+            sum([p[0] / n for p in pointse]),
+            sum([p[1] / n for p in pointse])
         )
 
 
@@ -100,16 +99,17 @@ class Gesture:
 # Here it uses the cosine and sine values of radian angle for rotating which are then stored in a new_points array 
 # It will rotate te x axis point counter clockwise and rotate the Y coordinate clockwise to get a best fit using the indicative angle returned
 # vetween the centroid line and the x axis
-    def rotateTo(self, angle):
-        c = self.centroid()
+    def rotateTo(self, angle,pointse):
+        c = self.centroid(pointse)
         new_points = []
-        for p in self.pointse:
+        for p in pointse:
             dx, dy = p[0] - c[0], p[1] - c[1]
             new_points.append((
                 dx * cos(angle) - dy * sin(angle) + c[0],
                 dx * sin(angle) + dy * cos(angle) + c[1]
             ))
-        self.pointse = new_points
+        pointse = new_points
+        return pointse
 
 
 
@@ -117,69 +117,71 @@ class Gesture:
 #It takes one inputs and then calls the BoundingBox function which returns points of new rectangle
 #After creating new array it  creates new coordinates by multiplying original to scaling factor
 #Scaling factor is desire size (in this case is square size by width and height of bounding box)
-    def scale_to(self, size):
-        B = self.bounding_box()
+    def scale_to(self, size,pointse):
+        B = self.bounding_box(pointse)
         new_points = []
-        for p in self.pointse:
+        for p in pointse:
             new_points.append((
                 p[0] * size / B[0],
                 p[1] * size / B[1]
             ))
-        self.pointse = new_points
+        pointse = new_points
+        return pointse
 
     
- #Bounding Box is smallest rectangle that will enclose the gesture where array points is passed as parameter
- # after initializing all the required variables it loopsthrough all the points resulting in the dimensions os the
- # smallest rectangle by substracting the min values to max     
-    def bounding_box(self):
+#Bounding Box is smallest rectangle that will enclose the gesture where array points is passed as parameter
+# after initializing all the required variables it loopsthrough all the points resulting in the dimensions os the
+# smallest rectangle by substracting the min values to max     
+    def bounding_box(self,pointse):
         minX, maxX = inf, -inf
         minY, maxY = inf, -inf
-        for point in self.pointse:
+        for point in pointse:
             minX, maxX = min(minX, point[0]), max(maxX, point[0])
             minY, maxY = min(minY, point[1]), max(maxY, point[1])
         return (maxX - minX, maxY - minY)
 
 #recentering the gesture by aligning its centroid to  the origin
-    def translate_to(self, target):
-        c = self.centroid()
+    def translate_to(self, target,pointse):
+        c = self.centroid(pointse)
         new_points = []
-        for p in self.pointse:
+        for p in pointse:
             new_points.append((
                 p[0] + target[0] - c[0],
                 p[1] + target[1] - c[1]
             ))
-        self.pointse = new_points
+        pointse = new_points
+        return pointse
 
 # distance at best angle will rotate a normalized gesture at various angles and calculatte the distance between the rotated gesture and a set of 
 # reference templates. The angle that produces the smallest distance is considered the "best angle" for recognizing the symbol. 
-    def distance_at_best_angle(self, T):
+    def distance_at_best_angle(self, T,pointse):
         a = -range_of_angle
         b = range_of_angle
         x1 = phi * a + (1 - phi) * b
         x2 = phi * b + (1 - phi) * a
-        f1 = self.distace_at_angle(T, x1)
-        f2 = self.distace_at_angle(T, x2)
+        f1 = self.distace_at_angle(T, x1,pointse)
+        f2 = self.distace_at_angle(T, x2,pointse)
         while abs(b - a) > angle_p:
             if f1 < f2:
                 b = x2
                 x2 = x1
                 f2 = f1
                 x1 = phi * a + (1 * phi) * b
-                f1 = self.distace_at_angle(T, x1)
+                f1 = self.distace_at_angle(T, x1,pointse)
             else:
                 a = x1
                 x1 = x2
                 f1 = f2
                 x2 = phi * b + (1 - phi) * a
-                f2 = self.distace_at_angle(T, x2)
+                f2 = self.distace_at_angle(T, x2,pointse)
         return min(f1, f2)
 
-    def distace_at_angle(self, T, angle):
-        r_angle = Gesture(self.pointse, False)
-        r_angle.rotateTo(angle)
-        return r_angle.path_distance(T)
+    def distace_at_angle(self, T, angle,pointse):
+        r_angle = Gesture()
+        r_angle.rotateTo(angle,pointse)
+        return r_angle.path_distance(T,pointse)
 
-    def path_distance(self,templatepoints):
+    def path_distance(self,templatepoints,pointse):
         #print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",len(self.points))
         if len(templatepoints)>64:
             print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",templatepoints)
@@ -187,7 +189,7 @@ class Gesture:
 
         n = len(templatepoints)
         #print("###########################################################################",n)
-        return sum([distance(self.pointse[i], templatepoints[i]) / n for i in range(n)])
+        return sum([distance(pointse[i], templatepoints[i]) / n for i in range(n)])
 
 
 def distance(p1, p2):
@@ -203,41 +205,12 @@ class Input:
     def __init__(self):
         # format the example gestures
         t0 = time.time()
-        # self.processed_xml_files=[]
         self.preprocessALLGestures1(data)
-        # a = [len(self.processed_xml_files[i1][i2][i3][i4]) for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
-        # print(a)
-        # self.unistrokes = []
-        # for template in Templates:
-        #     self.unistrokes.append(Gesture(template[1]))
-        #     self.unistrokes[-1].name = template[0]
-        # if f:
-        # self.random_100(self.processed_xml_files)
-        # print("777777",self.processed_xml_files[0][0][0][0])
-        
-   
-    # def preprocessALLGestures1(self,xmlfiles):
-    #     processed_xml_files=[]
-
-    #     for user in range(len(xmlfiles)):
-    #         p=[]
-    #         for speed in range(len(xmlfiles[user])):
-    #             q=[]
-    #             for g in range(len(xmlfiles[user][speed])):
-    #                 r=[]
-    #                 for t in range(len(xmlfiles[user][speed][g])):
-    #                     arr=Gesture(xmlfiles[user][speed][g][t])
-    #                     print("---------",len(arr.points))
-    #                     r.append(arr.points)
-    #                 q.append(r)
-    #             p.append(q)
-    #         processed_xml_files.append(p)
-    #     return processed_xml_files
+    
 
     def preprocessALLGestures1(self,data):
-        
         numUsers=len(data[0][0])
-        #numSpeed=len(data[1][0])
+        numSpeed=len(data[1][0])
         numGestures=len(data[1][1][1][1])
         numForEachGesture=len(data[1][1][1][1][1][1])
         c=0
@@ -248,9 +221,9 @@ class Input:
             for gesture in range(numGestures):
                 for t in range(numForEachGesture):
                     # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",data[user][1][Speed][1][gesture][1][t])
-                    arr=Gesture(data[user][1][Speed][1][gesture][1][t])
-                    data[user][1][Speed][1][gesture][1][t]=arr.pointse
-                    if len(arr.pointse)==64:
+                    arr=Recognize.preprocess(data[user][1][Speed][1][gesture][1][t])
+                    data[user][1][Speed][1][gesture][1][t]=arr
+                    if len(arr)==64:
                         c=c+1
                     else:
                         cn=cn+1
@@ -303,98 +276,10 @@ class Input:
                 cd=[]
             Templates1=  []
             cd=[]
-
-
-
-
-                
-                
-
-                    
-                        
-                   
-               
-        
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",c,cn)
-
- 
-                
-    def random_100(self,processed_xml_files):
-        pace=1
-        Users = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
-        SpeedArray=["fast","medium","slow"]
-        gestures = ["arrow", "caret" , "check" , "circle" , "delete_mark" , "left_curly_brace" ,"left_sq_bracket", "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" ,"right_sq_bracket", "star", "triangle" , "v" , "x"]
-        gesturetypenumber=["01","02","03","04","05","06","07","08","09","10"]
-        # a = [len(processed_xml_files[i1][i2][i3][i4])for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
         
-        # print(a)
-        
-        for user in range(len(processed_xml_files)):
-
-            for t in range(0,9):      
-                Templates=[]
-                r=random.randint(0,9)  
-                if r!=t:
-
-                    for g in range(len(processed_xml_files[user][pace])):
-                            str=gestures[g]+gesturetypenumber[t]
-                            print("here", len(processed_xml_files[user][pace][g][t]), user,g,t)
-                            Templates.append((str,processed_xml_files[user][pace][g][t]))
-                    for k in range(len(processed_xml_files[user][pace])):
-                        str1=gestures[k]+gesturetypenumber[r]
-
-                        Candidate=processed_xml_files[user][pace][k][r]
-                        print("Candidate name ",str1)
-                        print(user,pace,k,r)
-                        a = [len(Templates[temp][1]) for temp in range(len(Templates))]
-                        print("Candidate size******",len(Candidate))
-                        print("template size******",a)
-                        if len(Templates[0][1])>64:
-                            self.unistrokes = []
-                            ti=[]
-                            for template in Templates:
-                                l=Gesture(template[1])
-                                ti.append((template[0],l.points))
-                            Templates=ti
-                        result=self.rec_ges(Candidate, Templates) 
-                        print("$$$$$$$$$$ ",result) 
-                
-
-                    
-                
-            
-                            
-
-
-
-
-
-       
-    
-
-
-    # # recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
-    # def rec_ges(self, points,Templates):
-
-    #     # here the call to gesture class will preprocess the candidate points
-    #     t0 = time.time()
-
-    #     ges = Gesture(points)
-    #     b = inf
-    #     result = ''
-    #     for template_stroke in Templates:
-    #         # returns the distance between candidate points and the template points after preprocessing
-    #         d = ges.distance_at_best_angle(template_stroke.points)
-
-    #         # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
-    #         if d < b:
-    #             # update the pt2 best gesture
-    #             b = d
-    #             result = template_stroke.name
-            
-    #     return (result,1.0 - b / HalfDiagonal)
-  # recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
-    def rec_ges(self, points,Templates2):
+# recognition gesture function will perform golden search using the golden ratio which calls the method distance at best angle
+    def rec_ges(self, pointse,Templates2):
 
         # here the call to gesture class will preprocess the candidate points
         t0 = time.time()
@@ -402,7 +287,8 @@ class Input:
         print("CopyTmplay Before==", len(copyTemplate))
         print("Josh LEMN===",len(Templates2))
         [print("JOSH=====",len(temp[1])) for temp in Templates2]
-        ges = Gesture(points,False)
+        ges = Gesture()
+        resamplespoints=Recognize.preprocess(pointse)
         [print("JOSH22=====",len(temp[1])) for temp in copyTemplate]
         print("CopyTmplay==", len(copyTemplate))
         b = inf
@@ -416,7 +302,7 @@ class Input:
             #print("JOSH1===",len(template_stroke[1]))
             #[print("JOSH222222=====",len(temp[1]),end='') for temp in Templates2]
             #print()
-            d = ges.distance_at_best_angle(template_stroke[1])
+            d = ges.distance_at_best_angle(template_stroke[1],resamplespoints)
 
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
@@ -429,94 +315,6 @@ class Input:
                 
         print("k @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",k) 
         return (result,1.0 - b / HalfDiagonal)
-
-
-# class Can:
-            
-    
-#     global points,f
-#     points = []
-#     num_points =64
-#     # flag variable to reset the canvas when drawing a new gesture again
-#     f=0        
-#     numUnistrokes = 16
-
-
-#     # object1=cntrl.Recognizer(numUnistrokes)
-
-
-#     def __init__(self):
-        
-#         self.root = tk.Tk()
-#         self.root.title("Group 21")
-#         self.canvas = Canvas(self.root, width=350, height=350)
-#         self.canvas.pack()
-#         self.text_widget = tk.Text(self.root, height=5, width=50)
-#         self.text_widget.pack(side="bottom", fill="x") 
-#         # button to start the drawing of a gesture and to add the starting point of a gesture to the points array
-#         self.canvas.bind("<ButtonPress>", self.mouseclickevent)
-#         # button to draw the gesture in a series of continuous points
-#         self.canvas.bind("<B1-Motion>", self.draw)
-#         # button release to capture/store/process the python main.py points on the canvas on release of the button
-#         self.canvas.bind("<ButtonRelease>", self.on_release)
-#         self.root.mainloop()
-
-
-    
-
-    
-
-
-#     def redraw(self,line_array):
-    
-#         self.canvas.create_line(self.line_array)
-#         # x = event.x
-#         # y = event.y
-#         # points.append((x, y))
-
-#     def mouseclickevent(self , event):
-#         global x, y,points,f
-#         if f>1:
-#             self.canvas.delete("all")
-#             self.text_widget.delete("1.0", END)
-#             #canvas.delete(text_widget)
-#         f=1 
-#         x, y = event.x, event.y
-#         points.append((x, y))
-        
-#     def draw(self,event):
-#         global x, y,points,f
-#         if f==1:
-#             self.canvas.create_line((x, y, event.x, event.y),fill='red',width=4)
-#             x = event.x
-#             y = event.y
-#             points.append((x, y))
-#         else:
-#             self.canvas.delete("all")
-            
-        
-
-#     def on_release(self, event):
-#         global f,points
-#         f=f+1
-#         x, y = event.x, event.y
-#         points.append((x, y))
-#         # print(points)
-#         if(len(points) >=10):
-            
-#             obj=Input()
-
-#         #     rest= obj.rec_ges(points)
-#         #     print("***",rest)
-#         #     #canvas.create_text(100, 100, text= obj.rec_ges(points))
-#         #     result=rest[0]+"("+str(rest[1])+")"
-#         #     self.text_widget.insert("1.0", result)
-#         # else:
-#         #     self.text_widget.insert("1.0", "Very Few points")
-        
-        
-#         points=[] 
-        
 
 
 Input()
