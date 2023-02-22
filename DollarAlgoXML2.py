@@ -7,15 +7,22 @@ import os
 import filestruct1 as filest
 import random
 import copy
+import csv
 text = os.getcwd()
 # hj=0
 data = []
 
 # Template points will be stored in UNISTROKE variable
 # List of List is being used to store the template points
+
 data=filest.XMLfolder().data
 OriginalData = copy.deepcopy(data)
 
+
+
+
+with open('output.csv', mode='w', newline='') as csv_file:
+    writer = csv.writer(csv_file)
 # print("&&&&&& ",len(xmlfiles),len(xmlfiles[0]),len(xmlfiles[0][0]),len(xmlfiles[0][0][0][0]),xmlfiles[0][0][0][0])
 
 # num variable stores the N value- that divides the total path length into N point path
@@ -235,9 +242,8 @@ class Input:
     #     return processed_xml_files
 
     def preprocessALLGestures1(self,data):
-        
         numUsers=len(data[0][0])
-        #numSpeed=len(data[1][0])
+        numSpeed=len(data[1][0])
         numGestures=len(data[1][1][1][1])
         numForEachGesture=len(data[1][1][1][1][1][1])
         c=0
@@ -256,53 +262,101 @@ class Input:
                         cn=cn+1
 
         # random 100 loop can be used here
-        for user in range(numUsers):
+        for user in range(1,numUsers):
         # for speed in range(numSpeed):
-            for t in range(numForEachGesture):
-                
-                for f in range(2):
-                    Templates1=  []
-                    cd=[]
-                    Templatesiszearr=[]
-                    r=random.randint(0,9)
+            recoscore=0
+            cg=0
+            visited=[0,1,2,3,4,5,6,7,8,9]
+            r=random.choice(visited)
+            visited.remove(r)
+            cd=[]
+            cdname=[]
+            for gesture in range(numGestures):
+                cd.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
+                cdname.append(data[user][1][Speed][1][gesture][0])
+            # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
+            Templates3=[]
+            for E in range(0,9):
+                r=random.choice(visited)
+                visited.remove(r)
+                templatename=[]
+                for i in range(10):
                     for gesture in range(numGestures):
-
-                        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",data[user][1][Speed][1][gesture][1][t])
-                        # arr=Gesture(data[user][1][Speed][1][gesture][1][t])
-                        # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",len(arr.points))
-                        # data[user][1][1][1][gesture][1][t]=arr.points
-                        # na= candidate gesture name, cd=candidate points
-                        # cd,na=data[user][1][Speed][1][gesture][1][r],data[user][1][Speed][1][gesture][0]
-                        candidatename=data[user][1][Speed][1][gesture][0]
-                        ct=data[user][1][Speed][1][gesture][1][r]
-                        cd.append((candidatename,ct))
-                        # print("*******************************",data[user][1][Speed][1][gesture][0])
-                        if r!=t:
-                            dt=data[user][1][Speed][1][gesture][1][t]
-                            templateName=data[user][1][Speed][1][gesture][0]
-                            Templatesiszearr.append(len(dt))
-                            Templates1.append((templateName,dt))
-                    print("cadidtae array length ############## ",len(cd))  
-                    h=0
+                        Templates3.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
+                        templatename.append(data[user][1][Speed][1][gesture][0])
+                    
                     for candidate in cd:
-                        [print("inside candidate loop******=====",len(temp[1])) for temp in Templates1]
-                        if h>3:
-                            break
-                        result=self.rec_ges(candidate[1],Templates1)
+                        result=self.rec_ges(candidate[1],Templates3)
+                        print("result####################################################################### ",result,candidate[0])
+                        cg=cg+1
+                        if result[0]==candidate[0]:
+                            recoscore=recoscore+1
 
-                        print("result####################################################################### ",result)
-                        h=h+1
+                avg_rec_user=recoscore/10
+                print("avg_rec_score&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ",avg_rec_user,cg,recoscore)
+              
+                
+
+
+
+
+
+                
+            
+                    
+                
+            
+
+                
+
+
+
+
+                
+             
+
+            # for t in range(numForEachGesture):
+            #     for f in range(2):
+            #         Templates1=[]
+            #         Templatesiszearr=[]
+            #         for gesture in range(numGestures):
+
+            #             # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",data[user][1][Speed][1][gesture][1][t])
+            #             # arr=Gesture(data[user][1][Speed][1][gesture][1][t])
+            #             # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",len(arr.points))
+            #             # data[user][1][1][1][gesture][1][t]=arr.points
+            #             # na= candidate gesture name, cd=candidate points
+            #             # cd,na=data[user][1][Speed][1][gesture][1][r],data[user][1][Speed][1][gesture][0]
+            #             candidatename=data[user][1][Speed][1][gesture][0]
+            #             ct=data[user][1][Speed][1][gesture][1][r]
+            #             cd.append((candidatename,ct))
+            #             # print("*******************************",data[user][1][Speed][1][gesture][0])
+            #             if r!=t:
+            #                 dt=data[user][1][Speed][1][gesture][1][t]
+            #                 templateName=data[user][1][Speed][1][gesture][0]
+            #                 Templatesiszearr.append(len(dt))
+            #                 Templates1.append((templateName,dt))
+            #         print("cadidtae array length ############## ",len(cd))  
+            #         h=0
+            #         for candidate in cd:
+            #             [print("inside candidate loop******=====",len(temp[1])) for temp in Templates1]
+            #             if h>3:
+            #                 break
+            #             result=self.rec_ges(candidate[1],Templates1)
+
+            #             print("result####################################################################### ",result)
+            #             h=h+1
                         
 
-                    # [print("Raja=====",len(temp[1])) for temp in Templates1]
-                    # for g in range(numGestures):
-                    #     cd,na=data[user][1][Speed][1][g][1][r],data[user][1][Speed][1][g][0]
-                    #     result=self.rec_ges(cd,Templates1) 
-                    #     print("result####################################################################### ",result,na)
-                Templates1=  []
-                cd=[]
-            Templates1=  []
-            cd=[]
+            #         # [print("Raja=====",len(temp[1])) for temp in Templates1]
+            #         # for g in range(numGestures):
+            #         #     cd,na=data[user][1][Speed][1][g][1][r],data[user][1][Speed][1][g][0]
+            #         #     result=self.rec_ges(cd,Templates1) 
+            #         #     print("result####################################################################### ",result,na)
+            #     Templates1=  []
+            #     cd=[]
+            # Templates1=  []
+            # cd=[]
 
 
 
@@ -315,54 +369,10 @@ class Input:
                    
                
         
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",c,cn)
 
  
                 
-    def random_100(self,processed_xml_files):
-        pace=1
-        Users = ["s02","s03","s04","s05","s06","s07","s08","s09","s10","s11"]
-        SpeedArray=["fast","medium","slow"]
-        gestures = ["arrow", "caret" , "check" , "circle" , "delete_mark" , "left_curly_brace" ,"left_sq_bracket", "pigtail" , "question_mark" , "rectangle" , "right_curly_brace" ,"right_sq_bracket", "star", "triangle" , "v" , "x"]
-        gesturetypenumber=["01","02","03","04","05","06","07","08","09","10"]
-        # a = [len(processed_xml_files[i1][i2][i3][i4])for i1 in range(len(self.processed_xml_files)) for i2 in range(len(self.processed_xml_files[0])) for i3 in range(len(self.processed_xml_files[0][0])) for i4 in range(len(self.processed_xml_files[0][0][0]))]
-        
-        # print(a)
-        
-        for user in range(len(processed_xml_files)):
-
-            for t in range(0,9):      
-                Templates=[]
-                r=random.randint(0,9)  
-                if r!=t:
-
-                    for g in range(len(processed_xml_files[user][pace])):
-                            str=gestures[g]+gesturetypenumber[t]
-                            print("here", len(processed_xml_files[user][pace][g][t]), user,g,t)
-                            Templates.append((str,processed_xml_files[user][pace][g][t]))
-                    for k in range(len(processed_xml_files[user][pace])):
-                        str1=gestures[k]+gesturetypenumber[r]
-
-                        Candidate=processed_xml_files[user][pace][k][r]
-                        print("Candidate name ",str1)
-                        print(user,pace,k,r)
-                        a = [len(Templates[temp][1]) for temp in range(len(Templates))]
-                        print("Candidate size******",len(Candidate))
-                        print("template size******",a)
-                        if len(Templates[0][1])>64:
-                            self.unistrokes = []
-                            ti=[]
-                            for template in Templates:
-                                l=Gesture(template[1])
-                                ti.append((template[0],l.points))
-                            Templates=ti
-                        result=self.rec_ges(Candidate, Templates) 
-                        print("$$$$$$$$$$ ",result) 
-                
-
-                    
-                
-            
+    
                             
 
 
@@ -420,14 +430,17 @@ class Input:
 
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
+            k.append((result1,1.0 - b / HalfDiagonal))
+
             if d < b:
                 # update the pt2 best gesture
                 b = d
                 result = template_stroke[0]
-                k.append((result,1.0 - b / HalfDiagonal))
 
                 
-        print("k @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",k) 
+        v=sorted(k, key = lambda x: x[1])
+        print("v @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",v[:16]) 
+
         return (result,1.0 - b / HalfDiagonal)
 
 
