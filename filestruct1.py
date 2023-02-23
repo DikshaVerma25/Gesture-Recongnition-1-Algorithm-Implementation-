@@ -87,10 +87,10 @@ class XMLfolder:
 
 
 
-        import json
+        # import json
 
-        with open('output.txt', 'w') as filehandle:
-            json.dump(xmlFolder_array, filehandle)
+        # with open('output.txt', 'w') as filehandle:
+        #     json.dump(xmlFolder_array, filehandle)
 
                     
 

@@ -18,12 +18,38 @@ data = []
 data=filest.XMLfolder().data
 OriginalData = copy.deepcopy(data)
 
+current_dir = os.path.dirname(__file__)
+csv_path = os.path.join(current_dir, 'output.csv')
+    
 
-
-
-with open('output.csv', mode='w', newline='') as csv_file:
-    writer = csv.writer(csv_file)
+# #def write_data_to_csv(csv_file_path, data):
+# with open(csv_path, mode='a', newline='') as csv_file:
+#     global writer 
+#     writer = csv.writer(csv_file)
+#     #csv_file.truncate(0) 
+#     writer.writerow(["Recognition Log: Jotsna Gowda & Diksha Verma", "$1 Algorithm"])
+#     writer.writerow(["User[all-users]", "GestureType[all-gestures-types]", "RandomIteration[1to100]", "#ofTrainingExamples[E]", "TrainingSetSize[count]", "TrainingSetContents[specific-gesture-instances]",
+#                     "Candidate[specific-instance]", "RecoResultGestureType[what-was-recognized]", "Correct/Incorrect[1or0]", "RecoResultScore", "RecoResultBestMatch[specific-instance]",
+#                     "RecoResultNBestSorted"])
+    #writer.writerow(data)
+ 
+       
 # print("&&&&&& ",len(xmlfiles),len(xmlfiles[0]),len(xmlfiles[0][0]),len(xmlfiles[0][0][0][0]),xmlfiles[0][0][0][0])
+
+# current_dir = os.path.dirname(__file__)
+
+# # Construct the path to the CSV file using the current directory
+# csv_path = os.path.join(current_dir, 'output.csv')
+
+
+# data_2 = [ 'Recognition Log: Jotsna Gowda, Diksha Verma // $1 Algorithm //  // USER-DEPENDENT RANDOM-1']
+# data_3 = ['User[all-users],GestureType[all-gestures-types],RandomIteration[1to100],#ofTrainingExamples[E],TotalSizeOfTrainingSet[count],TrainingSetContents[specific-gesture-instances],Candidate[specific-instance],RecoResultGestureType[what-was-recognized],CorrectIncorrect[1or0],RecoResultScore,RecoResultBestMatch[specific-instance],RecoResultNBestSorted[instance-and-score]']
+# write_data_to_csv(csv_path, data_2)
+# write_data_to_csv(csv_path, data_3)
+
+
+#write_data_to_csv(csv_path, data_3)
+
 
 # num variable stores the N value- that divides the total path length into N point path
 num = 64
@@ -35,6 +61,7 @@ angle_p = (2 / 180) * pi
 phi = 0.5 * (-1.0 + (5.0)**0.5)
 Diagonal = math.sqrt(square_size * square_size + square_size * square_size)
 HalfDiagonal = 0.5 * Diagonal
+
 
 
 class Gesture:
@@ -242,6 +269,7 @@ class Input:
     #     return processed_xml_files
 
     def preprocessALLGestures1(self,data):
+        global writer
         numUsers=len(data[0][0])
         numSpeed=len(data[1][0])
         numGestures=len(data[1][1][1][1])
@@ -261,41 +289,120 @@ class Input:
                     else:
                         cn=cn+1
 
+        #def write_data_to_csv(csv_file_path, data):
+        with open(csv_path, mode='a', newline='') as csv_file:
+            global writer 
+            writer = csv.writer(csv_file)
+            csv_file.truncate(0) 
+            writer.writerow(["Recognition Log: Jotsna Gowda & Diksha Verma", "$1 Algorithm"])
+            writer.writerow(["User[all-users]", "GestureType[all-gestures-types]", "RandomIteration[1to100]", "#ofTrainingExamples[E]", "TrainingSetSize[count]", "TrainingSetContents[specific-gesture-instances]",
+                            "Candidate[specific-instance]", "RecoResultGestureType[what-was-recognized]", "Correct/Incorrect[1or0]", "RecoResultScore", "RecoResultBestMatch[specific-instance]",
+                            "RecoResultNBestSorted"])
+        
         # random 100 loop can be used here
-        for user in range(1,numUsers):
-        # for speed in range(numSpeed):
-            recoscore=0
-            cg=0
-            visited=[0,1,2,3,4,5,6,7,8,9]
-            r=random.choice(visited)
-            visited.remove(r)
-            cd=[]
-            cdname=[]
-            for gesture in range(numGestures):
-                cd.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
-                cdname.append(data[user][1][Speed][1][gesture][0])
-            # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
-            Templates3=[]
-            for E in range(0,9):
-                r=random.choice(visited)
-                visited.remove(r)
-                templatename=[]
-                for i in range(10):
-                    for gesture in range(numGestures):
-                        Templates3.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
-                        templatename.append(data[user][1][Speed][1][gesture][0])
-                    
-                    for candidate in cd:
-                        result=self.rec_ges(candidate[1],Templates3)
-                        print("result####################################################################### ",result,candidate[0])
-                        cg=cg+1
-                        if result[0]==candidate[0]:
-                            recoscore=recoscore+1
+            for user in range(1,2):
+                rec_count =0
+                total_count =0
+            # for speed in range(numSpeed):
+                #for gesture in range(numGestures):
+                    #candidateList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
+                    #cdname.append(data[user][1][Speed][1][gesture][0])
+                # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
 
-                avg_rec_user=recoscore/10
-                print("avg_rec_score&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ",avg_rec_user,cg,recoscore)
-              
+                for E in range(1,10):
+                    recoscore=0
+                    for i in range(1,2):
+                        TemplatesList=[]
+                        candidateList=[]
+                        templatename=[]
+                        CandidateNames=[]
+                        cdname=[]
+                        trainingsetcontents=""
+                        candidate_num_list = {}
+                        for gesture in range(numGestures):
+                            templatenumbers=random.sample(range(0,10),E)
+                            print("templatenumbers******",templatenumbers)
+                            candidatenumbers=random.sample(list(set([i for i in range(0,10)]) - set(templatenumbers)), 1)[0]
+                            print("&&&&&&&&",candidatenumbers)
+                            
+                            for num in templatenumbers:
+                                TemplatesList.append((data[user][1][Speed][1][gesture][0],data[user][0],num,data[user][1][Speed][1][gesture][1][num]))
+                                templatename.append(data[user][1][Speed][1][gesture][0]+'0'+str(num))
+                                #trainingsetcontents = trainingsetcontents+"{}-{}-{}:::".format(user, data[user][1][Speed][1][gesture][0], num)
+                                trainingsetcontents += "{}-{}-{}".format( data[user][0],data[user][1][Speed][1][gesture][0],num)
+                            
+                            candidatel=(data[user][1][Speed][1][gesture][0],data[user][0],candidatenumbers,data[user][1][Speed][1][gesture][1][candidatenumbers])
+                            #candidate_num_list[candidatel]=candidatenumbers
+                            candidateList.append(candidatel)
+                            CandidateNames.append(data[user][1][Speed][1][gesture][0]+'0'+str(candidatenumbers))
+                            print("TemplatesList@@@@@@@@@@@@@@@@@",len(templatename) )
+                            print("CandidateList^^^^^^^^^^^^^^^^^",len(CandidateNames))
+                            
+                        for candidate in candidateList:
+                            #candidate_num = candidate_num_list[candidate]
+                            log =[]
+                            total_count += 1
+                            result=self.rec_ges(candidate[3],TemplatesList)
+                            print("result####################################################################### ",result,candidate[0])
+                            user_s = data[user][0]
+                            ges_name = candidate[0]
+                            i_no = i
+                            train_exp = E
+                            total_size = E * 16
+                            candidate_log = "{}-{}-{}".format( candidate[1],ges_name ,candidate[2])
+                            rec_ges_name = result[0]
+                            rec_check = 0
+                            rec_score = result[1]
+                            rec_best_match = "{}-{}-{}".format( result[2],result[0], result[3])
+                            print("**************************", ges_name)
+                            n_best_list = ""
+                            for nb in result[4]:
+                                n_best_list += "{}-{}-{}-{}-----".format(nb[2], nb[0], nb[3], nb[1])
+                            
+                            if  rec_ges_name ==   ges_name:
+                                rec_check = 1
+                                rec_count += 1
+                                
+                                
+                            log.append(user_s)
+                            log.append(ges_name)
+                            log.append(i_no)
+                            log.append(train_exp)
+                            log.append(total_size)
+                            log.append(trainingsetcontents)
+                            log.append(candidate_log)
+                            log.append(rec_best_match)
+                            log.append(rec_check)
+                            log.append(rec_score)  
+                            log.append(rec_best_match)
+                            log.append(n_best_list)  
+                            writer.writerow(log)
+                            
+            avg_accuracy = rec_count /total_count
+            test =[]
+            print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy)
+            test.append("Total avg. accuracy:")
+            test.append(avg_accuracy)
+            writer.writerow(test)                    
+
+                        #for gesture in range(numGestures):
+                            #TemplatesList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
+                            #templatename.append(data[user][1][Speed][1][gesture][0])
+                        
+                        #for candidate in candidateList:
+                            #result=self.rec_ges(candidate[1],TemplatesList)
+                            #print("result####################################################################### ",result,candidate[0])
+                            #cg=cg+1
+                            #if result[0]==candidate[0]:
+                                #recoscore=recoscore+1
+
+                    #avg_rec_user=recoscore/10
+                    #print("avg_rec_score&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ",avg_rec_user,cg,recoscore)
                 
+                    #data_1 = [user, ges_name, i, E, len(Templates3), "{}" ]
+                    #write_data_to_csv(csv_path, data_1)
+                
+                    
 
 
 
@@ -417,6 +524,8 @@ class Input:
         print("CopyTmplay==", len(copyTemplate))
         b = inf
         result = ''
+        resultuser = ''
+        resultnum =-1
         k=[]
         for template_stroke in copyTemplate:
             # returns the distance between candidate points and the template points after preprocessing
@@ -426,22 +535,26 @@ class Input:
             #print("JOSH1===",len(template_stroke[1]))
             #[print("JOSH222222=====",len(temp[1]),end='') for temp in Templates2]
             #print()
-            d = ges.distance_at_best_angle(template_stroke[1])
+            d = ges.distance_at_best_angle(template_stroke[3])
 
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
-            k.append((result1,1.0 - b / HalfDiagonal))
+            k.append((result1,1.0 - b / HalfDiagonal,template_stroke[1],template_stroke[2]))
 
             if d < b:
                 # update the pt2 best gesture
                 b = d
                 result = template_stroke[0]
+                resultuser=template_stroke[1]
+                resultnum=template_stroke[2]
 
                 
-        v=sorted(k, key = lambda x: x[1])
-        print("v @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",v[:16]) 
+        v=sorted(k, key = lambda x: x[1], reverse= True)
+        if len(v) >50:
+            v = v[:50]
+        print("v @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",v) 
 
-        return (result,1.0 - b / HalfDiagonal)
+        return (result,1.0 - b / HalfDiagonal,resultuser,resultnum ,v)
 
 
 # class Can:
