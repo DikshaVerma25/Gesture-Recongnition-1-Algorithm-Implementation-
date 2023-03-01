@@ -86,7 +86,7 @@ def draw_count_chart():
         # canvas.create_text((i + 0.5) * bar_width, canvas_height - (10 + 0.5) * bar_height,
         #                     text=gesture + " ({}/{})".format(count, 10), font=("Arial", 12), tags="count_chart")
         #print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    canvas.create_text(canvas_width // 2, bar_height // 2, text="Gesture {} / {} {} {}".format(sum(gesture_count), len(gestures) * 10, "Loop No. ", gesture_count[0]),
+    canvas.create_text(canvas_width // 2, bar_height // 2, text="Gesture {} / {} {} {}".format(sum(gesture_count), len(gestures) * 10, "Sample No. ", gesture_count[0]),
                         font=("Arial", 12), tags="count_chart")
 
 
@@ -168,6 +168,31 @@ def save_to_xml(coords, filename):
     xml_file.write("gesture-user/{}-{}.xml".format(current_gesture, gesture_count[gestures.index(current_gesture)]))
     tree = ET.ElementTree(root)
     tree.write(file_path)
+
+# def save_to_xml(coords, filename):
+#     global current_gesture, gesture_count
+
+#     folder_path = "gesture-user"
+
+#     if not os.path.exists(folder_path):
+#         os.makedirs(folder_path)
+    
+#     file_path = os.path.join(folder_path, filename)
+
+#     # root = ET.Element("Gesture", {"Name": current_gesture, "Subject": "1", "Number": "1", "NumPts": str(len(coords)), "Millseconds": "0", "AppName": "Gestures", "AppVer": "1.0", "Date": date.today().strftime("%A, %B %d, %Y"), "TimeOfDay": time.strftime("%H:%M:%S")})
+
+#     # root.set("ID", str(gesture_count[gestures.index(current_gesture)]))
+    
+#     root = ET.Element("Gesture", {"Name": filename, "Subject": "1", "Number": "1", "NumPts": str(len(coords)), "Millseconds": "0", "AppName": "Gestures", "AppVer": "1.0", "Date": date.today().strftime("%A, %B %d, %Y"), "TimeOfDay": time.strftime("%H:%M:%S")})
+
+#     root.set("Name", current_gesture)
+#     root.set("ID", str(gesture_count[gestures.index(current_gesture)]))
+
+#     for x, y in coords:
+#         point = ET.SubElement(root, "Point", X=str(x), Y=str(y), T="0")
+
+#     xml_file = ET.ElementTree(root)
+#     xml_file.write(os.path.join(folder_path, filename))
 
 
 # Adding the Erase button
