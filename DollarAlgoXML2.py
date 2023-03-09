@@ -265,12 +265,13 @@ class Input:
     #                     r.append(arr.points)
     #                 q.append(r)
     #             p.append(q)
-    #         processed_xml_files.append(p)
+    #         processed_xml_files.append(p)c
     #     return processed_xml_files
 
     def preprocessALLGestures1(self,data):
         global writer
-        numUsers=len(data[0][0])
+        numUsers=len(data)
+        print("********************$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", numUsers)
         numSpeed=len(data[1][0])
         numGestures=len(data[1][1][1][1])
         numForEachGesture=len(data[1][1][1][1][1][1])
@@ -300,9 +301,10 @@ class Input:
                             "RecoResultNBestSorted"])
         
         # random 100 loop can be used here
-            for user in range(1,2):
-                rec_count =0
-                total_count =0
+            rec_count =0
+            total_count =0
+            for user in range(numUsers):
+                
             # for speed in range(numSpeed):
                 #for gesture in range(numGestures):
                     #candidateList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
@@ -311,7 +313,7 @@ class Input:
 
                 for E in range(1,10):
                     recoscore=0
-                    for i in range(1,2):
+                    for i in range(1,11):
                         TemplatesList=[]
                         candidateList=[]
                         templatename=[]
@@ -539,7 +541,7 @@ class Input:
 
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
-            k.append((result1,1.0 - b / HalfDiagonal,template_stroke[1],template_stroke[2]))
+            k.append((result1,1.0 - d / HalfDiagonal,template_stroke[1],template_stroke[2]))
 
             if d < b:
                 # update the pt2 best gesture
