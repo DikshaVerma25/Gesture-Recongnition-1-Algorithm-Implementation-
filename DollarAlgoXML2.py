@@ -8,6 +8,8 @@ import filestruct1 as filest
 import random
 import copy
 import csv
+#import matplotlib
+
 text = os.getcwd()
 # hj=0
 data = []
@@ -303,6 +305,8 @@ class Input:
         # random 100 loop can be used here
             rec_count =0
             total_count =0
+            in_count =0
+            Array_er=[]
             for user in range(numUsers):
                 
             # for speed in range(numSpeed):
@@ -310,8 +314,12 @@ class Input:
                     #candidateList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
                     #cdname.append(data[user][1][Speed][1][gesture][0])
                 # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
-
+                error = []
+                Ep = [ ]
                 for E in range(1,10):
+                    tt=0
+                    inc_c =0
+                    
                     recoscore=0
                     for i in range(1,11):
                         TemplatesList=[]
@@ -344,6 +352,8 @@ class Input:
                             #candidate_num = candidate_num_list[candidate]
                             log =[]
                             total_count += 1
+                            tt += 1
+                            
                             result=self.rec_ges(candidate[3],TemplatesList)
                             print("result####################################################################### ",result,candidate[0])
                             user_s = data[user][0]
@@ -364,7 +374,8 @@ class Input:
                             if  rec_ges_name ==   ges_name:
                                 rec_check = 1
                                 rec_count += 1
-                                
+                                inc_c += 1
+                                in_count += 1 
                                 
                             log.append(user_s)
                             log.append(ges_name)
@@ -379,13 +390,29 @@ class Input:
                             log.append(rec_best_match)
                             log.append(n_best_list)  
                             writer.writerow(log)
-                            
+                    err = inc_c / tt
+                    error.append(err) 
+                    Ep.append(E)
+                Array_er.append(error)    
+                
+                # plt.plot(Ep,error)
+                # plt.xlabel('X-axis')
+                # plt.ylabel('Y-axis')
+                # plt.title("A simple line graph")
+                # plt.show()
+                
+               
+                 
+                       
             avg_accuracy = rec_count /total_count
             test =[]
             print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy)
             test.append("Total avg. accuracy:")
             test.append(avg_accuracy)
-            writer.writerow(test)                    
+            writer.writerow(test)
+            print(Array_er)
+               
+                             
 
                         #for gesture in range(numGestures):
                             #TemplatesList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))

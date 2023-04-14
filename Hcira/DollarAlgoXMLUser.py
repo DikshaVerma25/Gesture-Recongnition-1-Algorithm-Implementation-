@@ -309,12 +309,18 @@ class Input:
                             "RecoResultNBestSorted"])
             per_user_accuracy =[]
             
+            
+            total_count = 0
+            rec_count = 0
+            uc=0
+            ut=0 
+            in_count =0
+            Array_er=[]
         # random 100 loop can be used here
             for user in range(numUsers):
-                total_count = 0
-                rec_count = 0
-                uc=0
-                ut=0 
+                error = []
+                Ep = [ ]
+                
                 
                
                
@@ -326,6 +332,9 @@ class Input:
                 # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
 
                 for E in range(1,10):
+                    tt=0
+                    inc_c =0
+                    
                     recoscore=0
                     for i in range(10):
                         TemplatesList=[]
@@ -364,7 +373,8 @@ class Input:
                         for candidate in candidateList:
                             #candidate_num = candidate_num_list[candidate]
                             log =[]
-                            total_count += 1 
+                            total_count += 1
+                            tt += 1 
                             # result will be a tuple of gest type,score,user,num
                             result=self.rec_ges(candidate[3],TemplatesList)
                             #print("result####################################################################### ",result,candidate[0])
@@ -389,6 +399,7 @@ class Input:
                                 uc+=1
                                 rec_check = 1
                                 rec_count += 1
+                                inc_c += 1
                                 
                             else:
                                 ut+=1
@@ -407,19 +418,24 @@ class Input:
                             log.append(rec_best_match)
                             log.append(n_best_list)  
                             writer.writerow(log)
+                    err = inc_c / tt
+                    error.append(err) 
+                    Ep.append(E)
+                Array_er.append(error)         
                             
-                average_acc= uc/ut *100
-                per_user_accuracy.append((average_acc, data[user][0]))
-                #print("zzzzzzzzzzzzzzzzzz", average_acc, user)
-                print(per_user_accuracy)
-                # avg_accuracy = rec_count /total_count
-                # print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy,user)
+            #     average_acc= uc/ut *100
+            #     per_user_accuracy.append((average_acc, data[user][0]))
+            #     #print("zzzzzzzzzzzzzzzzzz", average_acc, user)
+            #     print(per_user_accuracy)
+            avg_accuracy = rec_count /total_count
+            print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy,user)
             test =[]
             
             print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", total_count)
-            #test.append("Total avg. accuracy:")
-            #test.append(avg_accuracy)
-            writer.writerow(test)                    
+            test.append("Total avg. accuracy:")
+            test.append(avg_accuracy)
+            writer.writerow(test)
+            print(Array_er)                    
 
             #     for gesture in range(numGestures):
             #         TemplatesList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
@@ -576,7 +592,7 @@ class Input:
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
             # k array will store the n best list
-            k.append((result1,1.0 - b / HalfDiagonal,template_stroke[1],template_stroke[2]))
+            k.append((result1,1.0 - d / HalfDiagonal,template_stroke[1],template_stroke[2]))
 
             if d < b:
                 # update the pt2 best gesture
@@ -586,7 +602,7 @@ class Input:
                 resultnum=template_stroke[2]
 
 
-        k.append((result,1.0 - b / HalfDiagonal,resultuser,resultnum))
+        #k.append((result,1.0 - b / HalfDiagonal,resultuser,resultnum))
       
         v=sorted(k, key = lambda x: x[1], reverse= True)
         if len(v) >50:
