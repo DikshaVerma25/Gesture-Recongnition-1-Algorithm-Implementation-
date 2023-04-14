@@ -82,7 +82,7 @@ class XMLfolder:
         # # will give [folders array(so1,so2,so3...)]/so2/[Pace array]/medium/[diff gestures]/ 4th gesture / [pointsarray]/pointarray[0]
         # print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",xmlFolder_array[1][1][1][1][4][1][0])
         # print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",len(xmlFolder_array[0][0]),xmlFolder_array[1][1][1][0],len(xmlFolder_array[1][0]),len(xmlFolder_array[1][1][1][1]),len(xmlFolder_array[1][1][1][1][1][1]))
-
+        print(len(xmlFolder_array[0][0]))
         return xmlFolder_array
 
 

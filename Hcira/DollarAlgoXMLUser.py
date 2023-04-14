@@ -271,14 +271,14 @@ class Input:
         global writer
         # 6
         numUsers=len(data)
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",numUsers)
+        # print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",numUsers)
         # 10
         numForEachGesture=len(data[1][1][1][1])
         # 16
         numGestures=len(data[1][1])
-        print("******************",numGestures)
+        # print("******************",numGestures)
 
-        print("&&&&&&&&&&&&&&&&&&&",numForEachGesture)
+        # print("&&&&&&&&&&&&&&&&&&&",numForEachGesture)
         c=0
         cn=0
         Speed=1
@@ -307,20 +307,36 @@ class Input:
             writer.writerow(["User[all-users]", "GestureType[all-gestures-types]", "RandomIteration[1to100]", "#ofTrainingExamples[E]", "TrainingSetSize[count]", "TrainingSetContents[specific-gesture-instances]",
                             "Candidate[specific-instance]", "RecoResultGestureType[what-was-recognized]", "Correct/Incorrect[1or0]", "RecoResultScore", "RecoResultBestMatch[specific-instance]",
                             "RecoResultNBestSorted"])
-        
+            per_user_accuracy =[]
+            
+            
+            total_count = 0
+            rec_count = 0
+            uc=0
+            ut=0 
+            in_count =0
+            Array_er=[]
         # random 100 loop can be used here
             for user in range(numUsers):
-                rec_count =0
-                total_count =0
+                error = []
+                Ep = [ ]
+                
+                
+               
+               
+                
             # for speed in range(numSpeed):
                 #for gesture in range(numGestures):
                     #candidateList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
                     #cdname.append(data[user][1][Speed][1][gesture][0])
                 # print("@@@@@@@@@@@@@@@@@@@@@@@@@@",cdname)
 
-                for E in range(1,2):
+                for E in range(1,10):
+                    tt=0
+                    inc_c =0
+                    
                     recoscore=0
-                    for i in range(1):
+                    for i in range(10):
                         TemplatesList=[]
                         candidateList=[]
                         templatename=[]
@@ -331,10 +347,10 @@ class Input:
                         for gesture in range(numGestures):
                             # storing an array of random numbers from the list betweeen 1,11
                             templatenumbers=random.sample(range(0,10),E)
-                            print("templatenumbers******",templatenumbers)
+                            # print("templatenumbers******",templatenumbers)
                             # storing the random number except for the numbers selected in templagtenumbers array
                             candidatenumbers=random.sample(list(set([i for i in range(0,10)]) - set(templatenumbers)), 1)[0]
-                            print("&&&&&&&&",candidatenumbers)
+                            # print("&&&&&&&&",candidatenumbers)
                             # creating a random list of templates for each type
                             for num in templatenumbers:
                                 # gesture name,user name,templatetype number,data points
@@ -348,8 +364,8 @@ class Input:
                             # creating a list of candidates
                             candidateList.append(candidatel)
                             CandidateNames.append(data[user][1][gesture][0]+'0'+str(candidatenumbers))
-                            print("TemplatesList@@@@@@@@@@@@@@@@@",len(templatename) )
-                            print("CandidateList^^^^^^^^^^^^^^^^^",len(CandidateNames))
+                            # print("TemplatesList@@@@@@@@@@@@@@@@@",len(templatename) )
+                            # print("CandidateList^^^^^^^^^^^^^^^^^",len(CandidateNames))
                         # adding each template tostore it in the global variable
                         for template in TemplatesList:
                             obj.addGesture(template) 
@@ -357,10 +373,11 @@ class Input:
                         for candidate in candidateList:
                             #candidate_num = candidate_num_list[candidate]
                             log =[]
-                            total_count += 1 
+                            total_count += 1
+                            tt += 1 
                             # result will be a tuple of gest type,score,user,num
                             result=self.rec_ges(candidate[3],TemplatesList)
-                            print("result####################################################################### ",result,candidate[0])
+                            #print("result####################################################################### ",result,candidate[0])
                             user_s = data[user][0]
                             ges_name = candidate[0]
                             i_no = i
@@ -371,15 +388,21 @@ class Input:
                             rec_check = 0
                             rec_score = result[1]
                             rec_best_match = "{}-{}-{}::::".format( result[2],result[0], result[3])
-                            print("**************************", ges_name)
+                            # print("**************************", ges_name)
                             n_best_list = ""
                             for nb in result[4]:
-                                print("nb !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",nb)
+                                #print("nb !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",nb)
                                 n_best_list += "{}-{}-{}-{}::::".format(nb[2], nb[0], nb[3], nb[1])
                             
                             if  rec_ges_name ==   ges_name:
+                                ut+=1
+                                uc+=1
                                 rec_check = 1
                                 rec_count += 1
+                                inc_c += 1
+                                
+                            else:
+                                ut+=1
                                 
                                 
                             log.append(user_s)
@@ -395,13 +418,24 @@ class Input:
                             log.append(rec_best_match)
                             log.append(n_best_list)  
                             writer.writerow(log)
+                    err = inc_c / tt
+                    error.append(err) 
+                    Ep.append(E)
+                Array_er.append(error)         
                             
+            #     average_acc= uc/ut *100
+            #     per_user_accuracy.append((average_acc, data[user][0]))
+            #     #print("zzzzzzzzzzzzzzzzzz", average_acc, user)
+            #     print(per_user_accuracy)
             avg_accuracy = rec_count /total_count
+            print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy,user)
             test =[]
-            print("pppppppppppppppppppppppppppppppppppppp", avg_accuracy)
+            
+            print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", total_count)
             test.append("Total avg. accuracy:")
             test.append(avg_accuracy)
-            writer.writerow(test)                    
+            writer.writerow(test)
+            print(Array_er)                    
 
             #     for gesture in range(numGestures):
             #         TemplatesList.append((data[user][1][Speed][1][gesture][0],data[user][1][Speed][1][gesture][1][r]))
@@ -534,11 +568,11 @@ class Input:
         # here the call to gesture class will preprocess the candidate points
         t0 = time.time()
         copyTemplate = copy.deepcopy(Templates2)
-        print("CopyTmplay Before==", len(copyTemplate))
-        print("Josh LEMN===",len(Templates2))
-        [print("JOSH=====",len(temp[1])) for temp in Templates2]
+        #print("CopyTmplay Before==", len(copyTemplate))
+        #print("Josh LEMN===",len(Templates2))
+        #[print("JOSH=====",len(temp[1])) for temp in Templates2]
         ges = Gesture(points,False)
-        [print("JOSH22=====",len(temp[1])) for temp in copyTemplate]
+        #[print("JOSH22=====",len(temp[1])) for temp in copyTemplate]
         print("CopyTmplay==", len(copyTemplate))
         b = inf
         result = ''
@@ -558,7 +592,7 @@ class Input:
             # calculates the minimum distance and store the template name with the minimum distance to recognize the gesture
             result1 = template_stroke[0]
             # k array will store the n best list
-            k.append((result1,1.0 - b / HalfDiagonal,template_stroke[1],template_stroke[2]))
+            k.append((result1,1.0 - d / HalfDiagonal,template_stroke[1],template_stroke[2]))
 
             if d < b:
                 # update the pt2 best gesture
@@ -568,7 +602,7 @@ class Input:
                 resultnum=template_stroke[2]
 
 
-        k.append((result,1.0 - b / HalfDiagonal,resultuser,resultnum))
+        #k.append((result,1.0 - b / HalfDiagonal,resultuser,resultnum))
       
         v=sorted(k, key = lambda x: x[1], reverse= True)
         if len(v) >50:

@@ -8,6 +8,7 @@ import glob
 import xml.etree.ElementTree as ET
 StoredTemplates=[]
 OriginalNumbers=["1","2","3","4","5","6","7","8","9","10"]
+
 class XMLfolder:
     def __init__(self):
         # self.xmlfiles=
@@ -22,7 +23,7 @@ class XMLfolder:
     def parse_folder(self):
         # get the current directory
         text = os.getcwd()
-        folder_path = text + '/xml_logsUser'
+        folder_path = text + '/xml_newUser'
         # data=[]
 
         # Get a list of folders inside the parent folder
@@ -85,19 +86,19 @@ class XMLfolder:
         # print("***",xmlFolder_array[0][1][1])
         # print("***",xmlFolder_array[2][1][2])
         # arrow
-        print("***",xmlFolder_array[3][1][2][0])
+        # print("***",xmlFolder_array[3][1][2][0])
         # print("***",xmlFolder_array[3][1][2][1])
         # 5th bracket for choose 1 of the 16 gestures[points array]
-        print("***",len(xmlFolder_array[3][1][2][1][0]))
+        # print("***",len(xmlFolder_array[3][1][2][1][0]))
         
 
         # 10
-        print("***",len(xmlFolder_array[1][1][1][1]))
+        # print("***",len(xmlFolder_array[1][1][1][1]))
 
         # 16
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",len(xmlFolder_array[1][1]))
-        print("################################",xmlFolder_array[1][1][1][0],xmlFolder_array[1][0])
-        print(xmlFolder_array[1][1][1][1][1])
+        # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",len(xmlFolder_array[1][1]))
+        # print("################################",xmlFolder_array[1][1][1][0],xmlFolder_array[1][0])
+        # print(xmlFolder_array[1][1][1][1][1])
 
 
         return xmlFolder_array
