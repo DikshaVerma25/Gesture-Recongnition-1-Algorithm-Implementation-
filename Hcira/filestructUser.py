@@ -23,7 +23,7 @@ class XMLfolder:
     def parse_folder(self):
         # get the current directory
         text = os.getcwd()
-        folder_path = text + '/xml_newUser'
+        folder_path = text + '/xml_logs'
         # data=[]
 
         # Get a list of folders inside the parent folder
